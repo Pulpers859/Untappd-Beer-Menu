@@ -356,76 +356,117 @@
     </footer>
   </div>
 
-  <script>
-    // ========= TAP LIST VIA GOOGLE SHEETS =========
-    // 1) Publish your Google Sheet as CSV (File → Share → Publish to web → CSV).
-    // 2) Paste that CSV URL below:
-    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
+<script>
+  // ========= TAP LIST VIA GOOGLE SHEETS =========
+  // 1) Publish your Google Sheet as CSV (File → Share → Publish to web → CSV).
+  // 2) Paste that CSV URL below:
+  const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
 
-    // This will be filled from the sheet:
-    let BEERS = [];
+  // Optional: filter by category (exact match). Leave [] to show all categories.
+  // Example: const CATEGORY_FILTERS = ["On Tap", "IPA"];
+  const CATEGORY_FILTERS = [];
 
-    const boardUpdated = document.getElementById("boardUpdated");
+  // This will be filled from the sheet:
+  let BEERS = [];
 
-    // Basic CSV parser (assumes no commas inside fields)
-    function parseCSV(csv) {
-      const lines = csv.trim().split("\n");
-      if (lines.length < 2) return [];
+  const boardUpdated = document.getElementById("boardUpdated");
 
-      const headers = lines[0].split(",").map(h => h.trim());
-      const beers = [];
+  // Basic CSV parser (assumes no commas inside fields)
+  function parseCSV(csv) {
+    const lines = csv.trim().split("\n");
+    if (lines.length < 2) return [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].split(",").map(c => c.trim());
-        if (row.length === 1 && row[0] === "") continue; // skip empty rows
+    const headers = lines[0].split(",").map(h => h.trim());
+    const beers = [];
 
-        const obj = {};
-        headers.forEach((h, idx) => {
-          obj[h] = row[idx] || "";
-        });
-        beers.push(obj);
-      }
-      return beers;
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i].split(",").map(c => c.trim());
+      if (row.length === 1 && row[0] === "") continue; // skip empty rows
+
+      const obj = {};
+      headers.forEach((h, idx) => {
+        obj[h] = row[idx] || "";
+      });
+      beers.push(obj);
+    }
+    return beers;
+  }
+
+  async function fetchBeersFromSheet() {
+    if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes("PASTE_YOUR")) {
+      console.warn("Google Sheet CSV URL is not set.");
+      return;
     }
 
-    async function fetchBeersFromSheet() {
-      if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes("PASTE_YOUR")) {
-        console.warn("Google Sheet CSV URL is not set.");
-        return;
-      }
-
-      try {
-        const res = await fetch(GOOGLE_SHEET_CSV_URL);
-        const text = await res.text();
-        BEERS = parseCSV(text);
-        buildMenu();
-      } catch (e) {
-        console.error("Error loading beer sheet:", e);
-      }
+    try {
+      const res = await fetch(GOOGLE_SHEET_CSV_URL);
+      const text = await res.text();
+      BEERS = parseCSV(text);
+      buildMenu();
+    } catch (e) {
+      console.error("Error loading beer sheet:", e);
     }
+  }
 
-    // ========= MENU RENDERING =========
+  // ========= MENU RENDERING =========
     function buildMenu() {
       const leftCol = document.getElementById("menuColumnLeft");
       const rightCol = document.getElementById("menuColumnRight");
       leftCol.innerHTML = "";
       rightCol.innerHTML = "";
 
-      const beers = [...BEERS];
+      let beers = [...BEERS];
 
-      // Sort by tap if provided
+      // Filter by "active" column
+      beers = beers.filter((beer) => {
+        const activeStr = (beer.active || beer.Active || "").toString().toLowerCase();
+        // Treat blank as active by default
+        const isActive =
+          activeStr === "" ||
+          activeStr === "true" ||
+          activeStr === "yes" ||
+          activeStr === "y" ||
+          activeStr === "1";
+        if (!isActive) return false;
+
+        // Filter by category if CATEGORY_FILTERS is non-empty
+        if (CATEGORY_FILTERS.length === 0) return true;
+        const cat = (beer.category || beer.Category || "").toString().trim();
+        return CATEGORY_FILTERS.includes(cat);
+      });
+
+      // Sort by category, then tap number
       beers.sort((a, b) => {
+        const ca = (a.category || a.Category || "").toString();
+        const cb = (b.category || b.Category || "").toString();
+        if (ca < cb) return -1;
+        if (ca > cb) return 1;
         const ta = parseInt(a.tap || a.Tap || "0", 10) || 0;
         const tb = parseInt(b.tap || b.Tap || "0", 10) || 0;
         return ta - tb;
       });
 
+      // Split into two columns
       const mid = Math.ceil(beers.length / 2);
       const leftBeers = beers.slice(0, mid);
       const rightBeers = beers.slice(mid);
 
       function renderColumn(list, container) {
+        let lastCategory = null;
+
         list.forEach((beer) => {
+          const cat = (beer.category || beer.Category || "").toString().trim();
+
+          // Add category header when category changes
+          if (cat && cat !== lastCategory) {
+            const header = document.createElement("div");
+            // reuse existing style from header (section-label)
+            header.className = "section-label";
+            header.textContent = cat;
+            container.appendChild(header);
+            lastCategory = cat;
+          }
+
           const row = document.createElement("div");
           row.className = "beer-row";
 
@@ -450,7 +491,8 @@
           }
 
           const featStr = (beer.featured || beer.Featured || "").toString().toLowerCase();
-          const isFeatured = featStr === "true" || featStr === "yes" || featStr === "y";
+          const isFeatured =
+            featStr === "true" || featStr === "yes" || featStr === "y" || featStr === "1";
 
           if (isFeatured) {
             const feat = document.createElement("span");
@@ -501,234 +543,235 @@
       }
     }
 
-    // ========= TICKER CONFIG =========
-    const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
-    const REFRESH_MS = 60000; // 60s
-    const MAX_AGE_HOURS = 7000;
+  // ========= TICKER CONFIG =========
+  const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
+  const REFRESH_MS = 60000; // 60s
+  const MAX_AGE_HOURS = 7000;
 
-    const tickerTrack = document.getElementById("tickerTrack");
-    const tickerContent = document.getElementById("tickerContent");
-    const statusText = document.getElementById("statusText");
+  const tickerTrack = document.getElementById("tickerTrack");
+  const tickerContent = document.getElementById("tickerContent");
+  const statusText = document.getElementById("statusText");
 
-    function timeAgo(dateString) {
-      const then = new Date(dateString);
-      if (isNaN(then)) return "";
-      const now = new Date();
-      const diffMs = now - then;
-      const minutes = Math.floor(diffMs / 60000);
-      const hours = Math.floor(minutes / 60);
+  function timeAgo(dateString) {
+    const then = new Date(dateString);
+    if (isNaN(then)) return "";
+    const now = new Date();
+    const diffMs = now - then;
+    const minutes = Math.floor(diffMs / 60000);
+    const hours = Math.floor(minutes / 60);
 
-      if (minutes < 1) return "just now";
-      if (minutes < 60) return `${minutes} min ago`;
-      if (hours < 24) return `${hours} hr${hours !== 1 ? "s" : ""} ago`;
-      const days = Math.floor(hours / 24);
-      return `${days} day${days !== 1 ? "s" : ""} ago`;
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes} min ago`;
+    if (hours < 24) return `${hours} hr${hours !== 1 ? "s" : ""} ago`;
+    const days = Math.floor(hours / 24);
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  }
+
+  function isRecentEnough(dateString) {
+    const then = new Date(dateString);
+    if (isNaN(then)) return false;
+    const now = new Date();
+    const diffMs = now - then;
+    const hours = diffMs / (1000 * 60 * 60);
+    return hours <= MAX_AGE_HOURS;
+  }
+
+  function cleanBeerName(name) {
+    if (!name) return "";
+    return name.replace(/^(a |an )/i, "").trim();
+  }
+
+  function parseRating(item) {
+    const raw = (item.description || "") + " " + (item.content || "");
+    const text = raw.replace(/<[^>]+>/g, " ");
+
+    let match = text.match(/\(([0-9.]+)\s*\/\s*5/i);
+    if (match) return match[1];
+
+    match = text.match(/([0-9.]+)\s*\/\s*5/i);
+    if (match) return match[1];
+
+    match = text.match(/Rating:\s*([0-9.]+)/i);
+    if (match) return match[1];
+
+    return "";
+  }
+
+  function parseUntappdTitle(title) {
+    let user = "";
+    let beer = "";
+    let brewery = "";
+
+    if (!title) return { user, beer, brewery };
+
+    let base = title;
+    const atIndex = base.toLowerCase().lastIndexOf(" at ");
+    if (atIndex !== -1) base = base.slice(0, atIndex);
+
+    let parts = base.split(" is drinking ");
+    if (parts.length === 1) parts = base.split(" drank ");
+
+    let rest = "";
+    if (parts.length > 1) {
+      user = parts[0].trim();
+      rest = parts[1].trim();
+    } else {
+      rest = base.trim();
     }
 
-    function isRecentEnough(dateString) {
-      const then = new Date(dateString);
-      if (isNaN(then)) return false;
-      const now = new Date();
-      const diffMs = now - then;
-      const hours = diffMs / (1000 * 60 * 60);
-      return hours <= MAX_AGE_HOURS;
+    let beerCandidate = rest;
+    let breweryCandidate = "";
+
+    const bySplit = rest.split(" by ");
+    if (bySplit.length > 1) {
+      beerCandidate = bySplit[0].trim();
+      breweryCandidate = bySplit.slice(1).join(" by ").trim();
     }
 
-    function cleanBeerName(name) {
-      if (!name) return "";
-      return name.replace(/^(a |an )/i, "").trim();
+    if (!breweryCandidate) {
+      const parenMatch = beerCandidate.match(/\(([^)]+)\)\s*$/);
+      if (parenMatch) {
+        breweryCandidate = parenMatch[1].trim();
+        beerCandidate = beerCandidate.replace(/\s*\([^)]+\)\s*$/, "").trim();
+      }
     }
 
-    function parseRating(item) {
-      const raw = (item.description || "") + " " + (item.content || "");
-      const text = raw.replace(/<[^>]+>/g, " ");
+    beer = beerCandidate;
+    brewery = breweryCandidate;
 
-      let match = text.match(/\(([0-9.]+)\s*\/\s*5/i);
-      if (match) return match[1];
+    return { user, beer, brewery };
+  }
 
-      match = text.match(/([0-9.]+)\s*\/\s*5/i);
-      if (match) return match[1];
+  function addSeparator(parent) {
+    const dot = document.createElement("span");
+    dot.className = "ticker-separator";
+    dot.textContent = "·";
+    parent.appendChild(dot);
+  }
 
-      match = text.match(/Rating:\s*([0-9.]+)/i);
-      if (match) return match[1];
+  function buildTicker(items) {
+    tickerContent.innerHTML = "";
 
-      return "";
+    if (!items || !items.length) {
+      const span = document.createElement("span");
+      span.className = "ticker-empty";
+      span.textContent = "No recent check-ins.";
+      tickerContent.appendChild(span);
+      return;
     }
 
-    function parseUntappdTitle(title) {
-      let user = "";
-      let beer = "";
-      let brewery = "";
+    const recentItems = items.filter((item) => isRecentEnough(item.pubDate));
 
-      if (!title) return { user, beer, brewery };
+    if (!recentItems.length) {
+      const span = document.createElement("span");
+      span.className = "ticker-empty";
+      span.textContent = "No check-ins in the selected time window.";
+      tickerContent.appendChild(span);
+      return;
+    }
 
-      let base = title;
-      const atIndex = base.toLowerCase().lastIndexOf(" at ");
-      if (atIndex !== -1) base = base.slice(0, atIndex);
+    const maxItems = Math.min(recentItems.length, 10);
 
-      let parts = base.split(" is drinking ");
-      if (parts.length === 1) parts = base.split(" drank ");
+    for (let i = 0; i < maxItems; i++) {
+      const item = recentItems[i];
+      const { user, beer, brewery } = parseUntappdTitle(item.title);
 
-      let rest = "";
-      if (parts.length > 1) {
-        user = parts[0].trim();
-        rest = parts[1].trim();
+      const cleanBeer = cleanBeerName(beer);
+      const rating = parseRating(item);
+      const time = timeAgo(item.pubDate);
+
+      const itemEl = document.createElement("span");
+      itemEl.className = "ticker-item";
+
+      const userEl = document.createElement("span");
+      userEl.className = "ticker-user";
+      userEl.textContent = user || "Someone";
+
+      const beerEl = document.createElement("span");
+      beerEl.className = "ticker-beer";
+      if (cleanBeer && brewery) {
+        beerEl.textContent = `${cleanBeer} by ${brewery}`;
+      } else if (cleanBeer) {
+        beerEl.textContent = cleanBeer;
       } else {
-        rest = base.trim();
+        beerEl.textContent = "A beer";
       }
 
-      let beerCandidate = rest;
-      let breweryCandidate = "";
+      const ratingEl = document.createElement("span");
+      ratingEl.className = "ticker-beer";
+      ratingEl.textContent = rating ? `Rated ${rating}/5` : "";
 
-      const bySplit = rest.split(" by ");
-      if (bySplit.length > 1) {
-        beerCandidate = bySplit[0].trim();
-        breweryCandidate = bySplit.slice(1).join(" by ").trim();
+      const timeEl = document.createElement("span");
+      timeEl.className = "ticker-time";
+      timeEl.textContent = time || "";
+
+      itemEl.appendChild(userEl);
+
+      if (cleanBeer) {
+        addSeparator(itemEl);
+        itemEl.appendChild(beerEl);
       }
 
-      if (!breweryCandidate) {
-        const parenMatch = beerCandidate.match(/\(([^)]+)\)\s*$/);
-        if (parenMatch) {
-          breweryCandidate = parenMatch[1].trim();
-          beerCandidate = beerCandidate.replace(/\s*\([^)]+\)\s*$/, "").trim();
-        }
+      if (rating) {
+        addSeparator(itemEl);
+        itemEl.appendChild(ratingEl);
       }
 
-      beer = beerCandidate;
-      brewery = breweryCandidate;
+      if (time) {
+        addSeparator(itemEl);
+        itemEl.appendChild(timeEl);
+      }
 
-      return { user, beer, brewery };
+      tickerContent.appendChild(itemEl);
+
+      if (i < maxItems - 1) {
+        const sep = document.createElement("span");
+        sep.className = "ticker-separator";
+        sep.textContent = "·";
+        tickerContent.appendChild(sep);
+      }
     }
 
-    function addSeparator(parent) {
-      const dot = document.createElement("span");
-      dot.className = "ticker-separator";
-      dot.textContent = "·";
-      parent.appendChild(dot);
-    }
+    const clone = tickerContent.cloneNode(true);
+    tickerTrack.innerHTML = "";
+    tickerTrack.appendChild(tickerContent);
+    tickerTrack.appendChild(clone);
+  }
 
-    function buildTicker(items) {
-      tickerContent.innerHTML = "";
+  async function fetchCheckins() {
+    try {
+      statusText.textContent = "Updating…";
 
-      if (!items || !items.length) {
-        const span = document.createElement("span");
-        span.className = "ticker-empty";
-        span.textContent = "No recent check-ins.";
-        tickerContent.appendChild(span);
+      const rssUrl = encodeURIComponent(VENUE_RSS_URL);
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
+
+      const res = await fetch(apiUrl);
+      if (!res.ok) {
+        statusText.textContent = "Feed error";
         return;
       }
 
-      const recentItems = items.filter((item) => isRecentEnough(item.pubDate));
+      const data = await res.json();
+      const items = data.items || [];
 
-      if (!recentItems.length) {
-        const span = document.createElement("span");
-        span.className = "ticker-empty";
-        span.textContent = "No check-ins in the selected time window.";
-        tickerContent.appendChild(span);
-        return;
-      }
-
-      const maxItems = Math.min(recentItems.length, 10);
-
-      for (let i = 0; i < maxItems; i++) {
-        const item = recentItems[i];
-        const { user, beer, brewery } = parseUntappdTitle(item.title);
-
-        const cleanBeer = cleanBeerName(beer);
-        const rating = parseRating(item);
-        const time = timeAgo(item.pubDate);
-
-        const itemEl = document.createElement("span");
-        itemEl.className = "ticker-item";
-
-        const userEl = document.createElement("span");
-        userEl.className = "ticker-user";
-        userEl.textContent = user || "Someone";
-
-        const beerEl = document.createElement("span");
-        beerEl.className = "ticker-beer";
-        if (cleanBeer && brewery) {
-          beerEl.textContent = `${cleanBeer} by ${brewery}`;
-        } else if (cleanBeer) {
-          beerEl.textContent = cleanBeer;
-        } else {
-          beerEl.textContent = "A beer";
-        }
-
-        const ratingEl = document.createElement("span");
-        ratingEl.className = "ticker-beer";
-        ratingEl.textContent = rating ? `Rated ${rating}/5` : "";
-
-        const timeEl = document.createElement("span");
-        timeEl.className = "ticker-time";
-        timeEl.textContent = time || "";
-
-        itemEl.appendChild(userEl);
-
-        if (cleanBeer) {
-          addSeparator(itemEl);
-          itemEl.appendChild(beerEl);
-        }
-
-        if (rating) {
-          addSeparator(itemEl);
-          itemEl.appendChild(ratingEl);
-        }
-
-        if (time) {
-          addSeparator(itemEl);
-          itemEl.appendChild(timeEl);
-        }
-
-        tickerContent.appendChild(itemEl);
-
-        if (i < maxItems - 1) {
-          const sep = document.createElement("span");
-          sep.className = "ticker-separator";
-          sep.textContent = "·";
-          tickerContent.appendChild(sep);
-        }
-      }
-
-      const clone = tickerContent.cloneNode(true);
-      tickerTrack.innerHTML = "";
-      tickerTrack.appendChild(tickerContent);
-      tickerTrack.appendChild(clone);
+      buildTicker(items);
+      statusText.textContent = "Last updated " + new Date().toLocaleTimeString();
+    } catch (err) {
+      console.error(err);
+      statusText.textContent = "Network error";
     }
+  }
 
-    async function fetchCheckins() {
-      try {
-        statusText.textContent = "Updating…";
+  function startAutoRefresh() {
+    fetchCheckins();
+    setInterval(fetchCheckins, REFRESH_MS);
+  }
 
-        const rssUrl = encodeURIComponent(VENUE_RSS_URL);
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchBeersFromSheet();  // load tap list from Google Sheets
+    startAutoRefresh();     // start Untappd ticker
+  });
+</script>
 
-        const res = await fetch(apiUrl);
-        if (!res.ok) {
-          statusText.textContent = "Feed error";
-          return;
-        }
-
-        const data = await res.json();
-        const items = data.items || [];
-
-        buildTicker(items);
-        statusText.textContent = "Last updated " + new Date().toLocaleTimeString();
-      } catch (err) {
-        console.error(err);
-        statusText.textContent = "Network error";
-      }
-    }
-
-    function startAutoRefresh() {
-      fetchCheckins();
-      setInterval(fetchCheckins, REFRESH_MS);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchBeersFromSheet();  // load tap list from Google Sheets
-      startAutoRefresh();     // start Untappd ticker
-    });
-  </script>
 </body>
 </html>
