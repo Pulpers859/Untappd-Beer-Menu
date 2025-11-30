@@ -360,72 +360,22 @@
     // ========= TAP LIST CONFIG (EDIT THIS SECTION) =========
     // Add/remove beers here. The screen auto-splits into 2 columns.
     const BEERS = [
-      {
-        name: "Who Ate My Peeps?",
-        brewery: "Funcleson Brew Works",
-        style: "Fruited Sour Ale",
-        abv: "6.2%",
-        ibu: "",
-        price: "$7",
-        pour: "16 oz",
-        tap: 1,
-        featured: true
-      },
-      {
-        name: "Laser Wolf IPA",
-        brewery: "Funcleson Brew Works",
-        style: "West Coast IPA",
-        abv: "7.1%",
-        ibu: "65 IBU",
-        price: "$7",
-        pour: "16 oz",
-        tap: 2,
-        featured: false
-      },
-      {
-        name: "Velvet Fog",
-        brewery: "Funcleson Brew Works",
-        style: "Oatmeal Stout",
-        abv: "5.8%",
-        ibu: "",
-        price: "$6",
-        pour: "16 oz",
-        tap: 3,
-        featured: false
-      },
-      {
-        name: "Neon Daydream",
-        brewery: "Funcleson Brew Works",
-        style: "Hazy Pale Ale",
-        abv: "5.4%",
-        ibu: "",
-        price: "$7",
-        pour: "16 oz",
-        tap: 4,
-        featured: true
-      },
-      {
-        name: "Basement Lager",
-        brewery: "Funcleson Brew Works",
-        style: "American Lager",
-        abv: "4.8%",
-        ibu: "",
-        price: "$5",
-        pour: "16 oz",
-        tap: 5,
-        featured: false
-      },
-      {
-        name: "Coffee & Chaos",
-        brewery: "Funcleson Brew Works",
-        style: "Coffee Porter",
-        abv: "6.0%",
-        ibu: "",
-        price: "$7",
-        pour: "13 oz",
-        tap: 6,
-        featured: false
-      }
+const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
+
+// Empty array – will be filled from Google Sheets.
+let BEERS = [];
+
+async function fetchBeersFromSheet() {
+  try {
+    const res = await fetch(GOOGLE_SHEET_CSV_URL);
+    const text = await res.text();
+
+    BEERS = parseCSV(text);
+    buildMenu();
+  } catch (e) {
+    console.error("Error loading beer sheet:", e);
+  }
+}
     ];
 
     // ========= TICKER CONFIG =========
