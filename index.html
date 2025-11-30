@@ -240,7 +240,7 @@
       display: inline-flex;
       align-items: center;
       will-change: transform;
-      animation: scroll 45s linear infinite; /* adjust speed here */
+      animation: scroll 45s linear infinite; /* adjust scroll speed */
     }
 
     .ticker-content {
@@ -357,26 +357,149 @@
   </div>
 
   <script>
-    // ========= TAP LIST CONFIG (EDIT THIS SECTION) =========
-    // Add/remove beers here. The screen auto-splits into 2 columns.
-    const BEERS = [
-const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
+    // ========= TAP LIST VIA GOOGLE SHEETS =========
+    // 1) Publish your Google Sheet as CSV (File → Share → Publish to web → CSV).
+    // 2) Paste that CSV URL below:
+    const GOOGLE_SHEET_CSV_URL = "PASTE_YOUR_GOOGLE_SHEET_CSV_URL_HERE";
 
-// Empty array – will be filled from Google Sheets.
-let BEERS = [];
+    // This will be filled from the sheet:
+    let BEERS = [];
 
-async function fetchBeersFromSheet() {
-  try {
-    const res = await fetch(GOOGLE_SHEET_CSV_URL);
-    const text = await res.text();
+    const boardUpdated = document.getElementById("boardUpdated");
 
-    BEERS = parseCSV(text);
-    buildMenu();
-  } catch (e) {
-    console.error("Error loading beer sheet:", e);
-  }
-}
-    ];
+    // Basic CSV parser (assumes no commas inside fields)
+    function parseCSV(csv) {
+      const lines = csv.trim().split("\n");
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].split(",").map(h => h.trim());
+      const beers = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(",").map(c => c.trim());
+        if (row.length === 1 && row[0] === "") continue; // skip empty rows
+
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = row[idx] || "";
+        });
+        beers.push(obj);
+      }
+      return beers;
+    }
+
+    async function fetchBeersFromSheet() {
+      if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes("PASTE_YOUR")) {
+        console.warn("Google Sheet CSV URL is not set.");
+        return;
+      }
+
+      try {
+        const res = await fetch(GOOGLE_SHEET_CSV_URL);
+        const text = await res.text();
+        BEERS = parseCSV(text);
+        buildMenu();
+      } catch (e) {
+        console.error("Error loading beer sheet:", e);
+      }
+    }
+
+    // ========= MENU RENDERING =========
+    function buildMenu() {
+      const leftCol = document.getElementById("menuColumnLeft");
+      const rightCol = document.getElementById("menuColumnRight");
+      leftCol.innerHTML = "";
+      rightCol.innerHTML = "";
+
+      const beers = [...BEERS];
+
+      // Sort by tap if provided
+      beers.sort((a, b) => {
+        const ta = parseInt(a.tap || a.Tap || "0", 10) || 0;
+        const tb = parseInt(b.tap || b.Tap || "0", 10) || 0;
+        return ta - tb;
+      });
+
+      const mid = Math.ceil(beers.length / 2);
+      const leftBeers = beers.slice(0, mid);
+      const rightBeers = beers.slice(mid);
+
+      function renderColumn(list, container) {
+        list.forEach((beer) => {
+          const row = document.createElement("div");
+          row.className = "beer-row";
+
+          const top = document.createElement("div");
+          top.className = "beer-top";
+
+          const name = document.createElement("div");
+          name.className = "beer-name";
+          name.textContent = beer.name || "";
+
+          const rightMeta = document.createElement("div");
+          rightMeta.style.display = "flex";
+          rightMeta.style.alignItems = "center";
+          rightMeta.style.gap = "6px";
+
+          const tapVal = beer.tap || beer.Tap || "";
+          if (tapVal) {
+            const tap = document.createElement("span");
+            tap.className = "tap-badge";
+            tap.textContent = `Tap ${tapVal}`;
+            rightMeta.appendChild(tap);
+          }
+
+          const featStr = (beer.featured || beer.Featured || "").toString().toLowerCase();
+          const isFeatured = featStr === "true" || featStr === "yes" || featStr === "y";
+
+          if (isFeatured) {
+            const feat = document.createElement("span");
+            feat.className = "featured-tag";
+            feat.textContent = "Featured";
+            rightMeta.appendChild(feat);
+          }
+
+          top.appendChild(name);
+          top.appendChild(rightMeta);
+
+          const bottom = document.createElement("div");
+          bottom.className = "beer-bottom";
+
+          const style = document.createElement("div");
+          style.className = "beer-style";
+          style.textContent = beer.style || beer.brewery || "";
+
+          const price = document.createElement("div");
+          price.className = "beer-price";
+          price.textContent = beer.price || "";
+
+          bottom.appendChild(style);
+          bottom.appendChild(price);
+
+          const metaInline = document.createElement("div");
+          metaInline.className = "beer-meta-inline";
+          const bits = [];
+          if (beer.abv) bits.push(beer.abv);
+          if (beer.ibu) bits.push(beer.ibu);
+          if (beer.pour) bits.push(beer.pour);
+          metaInline.textContent = bits.join(" · ");
+
+          row.appendChild(top);
+          if (bits.length) row.appendChild(metaInline);
+          row.appendChild(bottom);
+
+          container.appendChild(row);
+        });
+      }
+
+      renderColumn(leftBeers, leftCol);
+      renderColumn(rightBeers, rightCol);
+
+      if (boardUpdated) {
+        const now = new Date();
+        boardUpdated.textContent = "Updated " + now.toLocaleTimeString();
+      }
+    }
 
     // ========= TICKER CONFIG =========
     const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
@@ -386,9 +509,7 @@ async function fetchBeersFromSheet() {
     const tickerTrack = document.getElementById("tickerTrack");
     const tickerContent = document.getElementById("tickerContent");
     const statusText = document.getElementById("statusText");
-    const boardUpdated = document.getElementById("boardUpdated");
 
-    // ========= HELPERS =========
     function timeAgo(dateString) {
       const then = new Date(dateString);
       if (isNaN(then)) return "";
@@ -486,95 +607,6 @@ async function fetchBeersFromSheet() {
       parent.appendChild(dot);
     }
 
-    // ========= BUILD MENU =========
-    function buildMenu() {
-      const leftCol = document.getElementById("menuColumnLeft");
-      const rightCol = document.getElementById("menuColumnRight");
-      leftCol.innerHTML = "";
-      rightCol.innerHTML = "";
-
-      const beers = [...BEERS];
-      // simple split into two columns
-      const mid = Math.ceil(beers.length / 2);
-      const leftBeers = beers.slice(0, mid);
-      const rightBeers = beers.slice(mid);
-
-      function renderColumn(list, container) {
-        list.forEach((beer) => {
-          const row = document.createElement("div");
-          row.className = "beer-row";
-
-          const top = document.createElement("div");
-          top.className = "beer-top";
-
-          const name = document.createElement("div");
-          name.className = "beer-name";
-          name.textContent = beer.name;
-
-          const metaInline = document.createElement("div");
-          metaInline.className = "beer-meta-inline";
-
-          const bits = [];
-          if (beer.abv) bits.push(beer.abv);
-          if (beer.ibu) bits.push(beer.ibu);
-          if (beer.pour) bits.push(beer.pour);
-          metaInline.textContent = bits.join(" · ");
-
-          top.appendChild(name);
-
-          const rightMeta = document.createElement("div");
-          rightMeta.style.display = "flex";
-          rightMeta.style.alignItems = "center";
-          rightMeta.style.gap = "6px";
-
-          if (beer.tap) {
-            const tap = document.createElement("span");
-            tap.className = "tap-badge";
-            tap.textContent = `Tap ${beer.tap}`;
-            rightMeta.appendChild(tap);
-          }
-
-          if (beer.featured) {
-            const feat = document.createElement("span");
-            feat.className = "featured-tag";
-            feat.textContent = "Featured";
-            rightMeta.appendChild(feat);
-          }
-
-          top.appendChild(rightMeta);
-
-          const bottom = document.createElement("div");
-          bottom.className = "beer-bottom";
-
-          const style = document.createElement("div");
-          style.className = "beer-style";
-          style.textContent = beer.style || beer.brewery || "";
-
-          const price = document.createElement("div");
-          price.className = "beer-price";
-          price.textContent = beer.price || "";
-
-          bottom.appendChild(style);
-          bottom.appendChild(price);
-
-          row.appendChild(top);
-          if (bits.length) row.appendChild(metaInline);
-          row.appendChild(bottom);
-
-          container.appendChild(row);
-        });
-      }
-
-      renderColumn(leftBeers, leftCol);
-      renderColumn(rightBeers, rightCol);
-
-      if (boardUpdated) {
-        const now = new Date();
-        boardUpdated.textContent = "Updated " + now.toLocaleTimeString();
-      }
-    }
-
-    // ========= BUILD TICKER =========
     function buildTicker(items) {
       tickerContent.innerHTML = "";
 
@@ -681,7 +713,6 @@ async function fetchBeersFromSheet() {
         const items = data.items || [];
 
         buildTicker(items);
-
         statusText.textContent = "Last updated " + new Date().toLocaleTimeString();
       } catch (err) {
         console.error(err);
@@ -695,8 +726,8 @@ async function fetchBeersFromSheet() {
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      buildMenu();
-      startAutoRefresh();
+      fetchBeersFromSheet();  // load tap list from Google Sheets
+      startAutoRefresh();     // start Untappd ticker
     });
   </script>
 </body>
