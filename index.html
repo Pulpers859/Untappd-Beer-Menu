@@ -201,7 +201,7 @@
       margin-left: 6px;
     }
 
-   /* === FOOTER TICKER === */
+/* === FOOTER TICKER === */
 .board-footer {
   flex: 0 0 auto;
   padding: 16px 18px 18px 18px;
@@ -228,7 +228,7 @@
   border-radius: 999px;
   border: 1px solid rgba(244, 196, 48, 0.9);
   background: rgba(244, 196, 48, 0.12);
-  font-size: 0.95rem;           /* smaller than before */
+  font-size: 0.9rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-yellow-soft);
@@ -244,13 +244,12 @@
   background: var(--accent-yellow);
 }
 
-/* 3D flip window */
+/* Main ticker area */
 .ticker-window {
   flex: 1;
   overflow: hidden;
   position: relative;
   height: 120px;
-  perspective: 600px;           /* smaller = chunkier 3D effect */
 }
 
 .ticker-track {
@@ -267,22 +266,21 @@
   flex-direction: column;
   justify-content: center;
   gap: 0.6rem;
-  transform-origin: center center;
-  backface-visibility: hidden;
 }
 
+/* Big main line + smaller subline */
 .ticker-line-main {
   display: inline-flex;
   align-items: baseline;
   gap: 0.5rem;
-  font-size: 2.4rem;
+  font-size: 2.2rem;
 }
 
 .ticker-line-sub {
   display: inline-flex;
   align-items: baseline;
   gap: 0.5rem;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: var(--text-muted);
 }
 
@@ -314,59 +312,94 @@
   color: var(--text-soft);
 }
 
-/* Status text on the right – now allowed to wrap to 2 lines */
+/* Status text on the right – real 2-line block */
 .status-pill {
   flex-shrink: 0;
-  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 0.85rem;
   line-height: 1.2;
   color: var(--text-muted);
-  white-space: normal;          /* was nowrap – now it can wrap */
-  text-align: right;
 }
 
-/* --- 3D flip states --- */
+.status-label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+}
+
+.status-time {
+  font-size: 0.95rem;
+}
+
+/* --- Pixel/glitch-ish card transition --- */
 .ticker-card--incoming {
-  transform: rotateX(-110deg) translateY(-18px) translateZ(-20px);
   opacity: 0;
 }
 
 .ticker-card--animate-in {
-  animation: tickerFlipIn 0.9s cubic-bezier(0.25, 0.8, 0.3, 1) forwards;
+  animation: tickerGlitchIn 0.5s steps(5, end) forwards;
 }
 
 .ticker-card--outgoing {
-  animation: tickerFlipOut 0.9s cubic-bezier(0.7, 0.1, 0.9, 0.3) forwards;
+  animation: tickerGlitchOut 0.5s steps(5, end) forwards;
 }
 
-@keyframes tickerFlipIn {
+/* Outgoing: deteriorates downward in chunky steps */
+@keyframes tickerGlitchOut {
   0% {
-    transform: rotateX(-110deg) translateY(-18px) translateZ(-20px) scale(0.96);
-    opacity: 0;
-  }
-  60% {
-    transform: rotateX(5deg) translateY(4px) translateZ(0) scale(1.02);
     opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+  25% {
+    clip-path: inset(20% 0 0 0);
+    transform: translateY(2px);
+  }
+  50% {
+    clip-path: inset(45% 0 0 0);
+    transform: translateY(4px);
+  }
+  75% {
+    clip-path: inset(70% 0 0 0);
+    transform: translateY(6px);
   }
   100% {
-    transform: rotateX(0deg) translateY(0) translateZ(0) scale(1);
-    opacity: 1;
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(8px);
   }
 }
 
-@keyframes tickerFlipOut {
+/* Incoming: builds up from bottom in chunky steps */
+@keyframes tickerGlitchIn {
   0% {
-    transform: rotateX(0deg) translateY(0) translateZ(0) scale(1);
-    opacity: 1;
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(8px);
   }
-  40% {
-    transform: rotateX(-5deg) translateY(-4px) translateZ(0) scale(1.02);
+  25% {
     opacity: 1;
+    clip-path: inset(70% 0 0 0);
+    transform: translateY(6px);
+  }
+  50% {
+    clip-path: inset(45% 0 0 0);
+    transform: translateY(4px);
+  }
+  75% {
+    clip-path: inset(20% 0 0 0);
+    transform: translateY(2px);
   }
   100% {
-    transform: rotateX(110deg) translateY(18px) translateZ(-20px) scale(0.96);
-    opacity: 0;
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
   }
 }
+
 
     /* === QR BLOCKS (dual neon) === */
     .header-qr-row {
@@ -544,9 +577,11 @@
           </div>
         </div>
 
-        <div class="status-pill" id="statusText">
-          Updating…
-        </div>
+        <div class="status-pill">
+  <span class="status-label">Status</span>
+  <span class="status-time" id="statusTime">Updating…</span>
+</div>
+
       </div>
     </footer>
   </div>
@@ -729,7 +764,8 @@ const MAX_AGE_HOURS = 7000;
 
 const tickerTrack = document.getElementById("tickerTrack");
 const tickerContent = document.getElementById("tickerContent");
-const statusText = document.getElementById("statusText");
+const statusTime = document.getElementById("statusTime");
+
 
 // NEW: state for the flip-card carousel
 let tickerData = [];
@@ -962,14 +998,14 @@ function renderTickerCard(item, immediate) {
 
     async function fetchCheckins() {
       try {
-        statusText.textContent = "Updating…";
+        statusTime.textContent = "Updating…";
 
         const rssUrl = encodeURIComponent(VENUE_RSS_URL);
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
 
         const res = await fetch(apiUrl);
         if (!res.ok) {
-          statusText.textContent = "Feed error";
+          statusTime.textContent = "Feed error";
           return;
         }
 
@@ -977,10 +1013,10 @@ function renderTickerCard(item, immediate) {
         const items = data.items || [];
 
         buildTicker(items);
-        statusText.textContent = "Last updated<br>" + new Date().toLocaleTimeString();
+        statusTime.textContent = new Date().toLocaleTimeString();
       } catch (err) {
         console.error(err);
-        statusText.textContent = "Network error";
+        statusTime.textContent = "Network error";
       }
     }
 
