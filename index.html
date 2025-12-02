@@ -24,7 +24,8 @@
       padding: 0;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -34,36 +35,26 @@
       color: var(--text-main);
     }
 
-  html, body {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-.frame {
-  height: 100vh;
-  width: 100%;
-}
-
     body {
       display: flex;
       align-items: stretch;
-      justify-content: center;
-      padding: 8px 16px;
+      justify-content: stretch;
+      padding: 0;
     }
 
     .board {
+      flex: 1 1 auto;
       width: 100%;
+      height: 100vh;           /* fill vertical screen */
       max-width: 1920px;
-      height: 100%;
-      max-height: 1080px;
       display: flex;
       flex-direction: column;
       background: var(--bg-main);
-      border-radius: 8px;
+      border-radius: 0;        /* flush with screen edges */
       border: 1px solid #20222c;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
       overflow: hidden;
+      margin: 0 auto;
     }
 
     /* === HEADER === */
@@ -78,7 +69,7 @@
     }
 
     .venue-name {
-      font-size: 1.3rem;
+      font-size: 2rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -87,19 +78,19 @@
 
     .header-right {
       display: flex;
-      align-items: baseline;
-      gap: 18px;
+      align-items: center;
+      gap: 24px;
     }
 
     .section-label {
-      font-size: 0.8rem;
+      font-size: 1.1rem;
       text-transform: uppercase;
       letter-spacing: 0.16em;
       color: var(--text-soft);
     }
 
     .small-timestamp {
-      font-size: 0.8rem;
+      font-size: 1rem;
       color: var(--text-muted);
     }
 
@@ -108,7 +99,7 @@
       flex: 1 1 auto;
       display: flex;
       gap: 16px;
-      padding: 14px 20px 10px 20px;
+      padding: 16px 20px;
       background: radial-gradient(circle at top, #1e202b 0%, #13151e 50%, #101119 100%);
     }
 
@@ -116,13 +107,13 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .beer-row {
       display: flex;
       flex-direction: column;
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 4px;
       background: rgba(24, 25, 32, 0.9);
       border: 1px solid rgba(39, 41, 53, 0.9);
@@ -136,7 +127,7 @@
     }
 
     .beer-name {
-      font-size: 1rem;
+      font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: 0.03em;
       text-transform: uppercase;
@@ -147,18 +138,18 @@
     }
 
     .beer-meta-inline {
-      font-size: 0.8rem;
+      font-size: 1.1rem;
       color: var(--text-soft);
       white-space: nowrap;
       opacity: 0.95;
     }
 
     .beer-bottom {
-      margin-top: 2px;
+      margin-top: 4px;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      font-size: 0.8rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
     }
 
@@ -175,21 +166,21 @@
     }
 
     .tap-badge {
-      font-size: 0.72rem;
+      font-size: 1rem;
       text-transform: uppercase;
       letter-spacing: 0.16em;
       border-radius: 999px;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border: 1px solid rgba(244, 196, 48, 0.85);
       color: var(--accent-yellow-soft);
     }
 
     .featured-tag {
-      font-size: 0.72rem;
+      font-size: 1rem;
       text-transform: uppercase;
       letter-spacing: 0.16em;
       border-radius: 999px;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border: 1px solid rgba(144, 205, 244, 0.8);
       color: #9cd0ff;
       margin-left: 6px;
@@ -198,7 +189,7 @@
     /* === FOOTER TICKER === */
     .board-footer {
       flex: 0 0 auto;
-      padding: 8px 18px 10px 18px;
+      padding: 10px 18px 12px 18px;
       background: #101119;
       border-top: 1px solid var(--divider);
     }
@@ -214,31 +205,14 @@
       border: 1px solid #20222c;
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
     }
-    
-    /* ---------------------------
-       FORCE TICKER TO BOTTOM
-       --------------------------- */
-    .ticker-wrapper {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-    }
 
-    .ticker-bar {
-      height: 52px; /* slightly taller */
-      display: flex;
-      align-items: center;
-    }
-
-    
     .ticker-label {
       flex-shrink: 0;
       padding: 6px 12px;
       border-radius: 999px;
       border: 1px solid rgba(244, 196, 48, 0.9);
       background: rgba(244, 196, 48, 0.12);
-      font-size: 0.7rem;
+      font-size: 0.95rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--accent-yellow-soft);
@@ -258,7 +232,7 @@
       flex: 1;
       overflow: hidden;
       position: relative;
-      height: 34px;
+      height: 40px;
     }
 
     .ticker-track {
@@ -267,14 +241,14 @@
       display: inline-flex;
       align-items: center;
       will-change: transform;
-      animation: scroll 45s linear infinite; /* adjust scroll speed */
+      animation: scroll 45s linear infinite;
     }
 
     .ticker-content {
       display: inline-flex;
       align-items: center;
       gap: 1.8rem;
-      font-size: 0.98rem;
+      font-size: 1.2rem;
       color: var(--text-main);
     }
 
@@ -282,36 +256,39 @@
       display: inline-flex;
       align-items: baseline;
       gap: 0.35rem;
+      font-size: 1.2rem;
     }
 
     .ticker-user {
       font-weight: 600;
       color: var(--accent-yellow);
+      font-size: 1.1rem;
     }
 
     .ticker-beer {
       font-weight: 600;
       color: var(--text-main);
+      font-size: 1.1rem;
     }
 
     .ticker-time {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--text-muted);
     }
 
     .ticker-separator {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--text-muted);
     }
 
     .ticker-empty {
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       color: var(--text-soft);
     }
 
     .status-pill {
       flex-shrink: 0;
-      font-size: 0.78rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
       white-space: nowrap;
     }
@@ -323,6 +300,96 @@
       to {
         transform: translateX(-50%);
       }
+    }
+
+    /* === QR BLOCKS (dual neon) === */
+    .header-qr-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .neon-qr {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, #ffef9f 0%, #ff6bd5 40%, #4fd1ff 80%, #1b1b2f 100%);
+      position: relative;
+      overflow: hidden;
+      animation: qrGlow 4.5s ease-in-out infinite;
+      box-shadow:
+        0 0 8px rgba(255, 255, 255, 0.4),
+        0 0 18px rgba(255, 107, 213, 0.55),
+        0 0 26px rgba(79, 209, 255, 0.55);
+    }
+
+    .neon-qr::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: 999px;
+      background: #080814;
+      opacity: 0.92;
+    }
+
+    .neon-qr-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .neon-qr-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #e5e7ff;
+    }
+
+    .neon-qr-text strong {
+      color: #ffef9f;
+      font-size: 0.95rem;
+    }
+
+    .neon-qr img {
+      width: 70px;
+      height: 70px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: #050509;
+      box-shadow:
+        0 0 8px rgba(255,255,255,0.25),
+        0 0 14px rgba(255, 239, 159, 0.45);
+    }
+
+    @keyframes qrGlow {
+      0% {
+        box-shadow:
+          0 0 8px rgba(255, 255, 255, 0.4),
+          0 0 18px rgba(255, 107, 213, 0.55),
+          0 0 26px rgba(79, 209, 255, 0.55);
+      }
+      50% {
+        box-shadow:
+          0 0 10px rgba(255, 255, 255, 0.6),
+          0 0 24px rgba(255, 107, 213, 0.8),
+          0 0 32px rgba(79, 209, 255, 0.8);
+      }
+      100% {
+        box-shadow:
+          0 0 8px rgba(255, 255, 255, 0.4),
+          0 0 18px rgba(255, 107, 213, 0.55),
+          0 0 26px rgba(79, 209, 255, 0.55);
+      }
+    }
+
+    /* Slightly larger base font overall */
+    body {
+      font-size: 20px;
     }
 
     @media (max-width: 900px) {
@@ -338,281 +405,56 @@
         width: 100%;
       }
 
+      .neon-qr img {
+        width: 44px;
+        height: 44px;
+      }
+      .neon-qr-text {
+        display: none;
+      }
+
       .ticker-label {
         display: none;
       }
     }
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-/* Neon QR block */
-.header-qr {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: radial-gradient(circle at top left, #ffef9f 0%, #ff6bd5 40%, #4fd1ff 80%, #1b1b2f 100%);
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 0 8px rgba(255, 255, 255, 0.4),
-    0 0 18px rgba(255, 107, 213, 0.55),
-    0 0 26px rgba(79, 209, 255, 0.55);
-}
-
-.header-qr::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: 999px;
-  background: #080814;
-  opacity: 0.9;
-}
-
-.header-qr-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.header-qr-text {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #e5e7ff;
-}
-
-.header-qr-text span:first-child {
-  opacity: 0.85;
-}
-
-.header-qr-text strong {
-  color: #ffef9f;
-  font-size: 0.8rem;
-}
-
-.header-qr-text span:last-child {
-  font-size: 0.65rem;
-  color: #a9b0ff;
-}
-
-.header-qr img {
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: #050509;
-  box-shadow:
-    0 0 8px rgba(255, 255, 255, 0.25),
-    0 0 14px rgba(255, 239, 159, 0.45);
-}
-
-/* Subtle neon shimmer */
-@keyframes qrGlow {
-  0% {
-    box-shadow:
-      0 0 8px rgba(255, 255, 255, 0.4),
-      0 0 18px rgba(255, 107, 213, 0.55),
-      0 0 26px rgba(79, 209, 255, 0.55);
-  }
-  50% {
-    box-shadow:
-      0 0 10px rgba(255, 255, 255, 0.6),
-      0 0 24px rgba(255, 107, 213, 0.8),
-      0 0 32px rgba(79, 209, 255, 0.8);
-  }
-  100% {
-    box-shadow:
-      0 0 8px rgba(255, 255, 255, 0.4),
-      0 0 18px rgba(255, 107, 213, 0.55),
-      0 0 26px rgba(79, 209, 255, 0.55);
-  }
-}
-
-.header-qr {
-  animation: qrGlow 4.5s ease-in-out infinite;
-}
-
-@media (max-width: 900px) {
-  .header-qr img {
-    width: 48px;
-    height: 48px;
-  }
-
-  .header-qr-text {
-    display: none; /* hide text on tiny screens */
-  }
-}
-
-    /* Dual QR container */
-.header-qr-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-/* Reusable neon QR block */
-.neon-qr {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: radial-gradient(circle at top left, #ffef9f 0%, #ff6bd5 40%, #4fd1ff 80%, #1b1b2f 100%);
-  position: relative;
-  overflow: hidden;
-  animation: qrGlow 4.5s ease-in-out infinite;
-  box-shadow:
-    0 0 8px rgba(255, 255, 255, 0.4),
-    0 0 18px rgba(255, 107, 213, 0.55),
-    0 0 26px rgba(79, 209, 255, 0.55);
-}
-
-.neon-qr::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 999px;
-  background: #080814;
-  opacity: 0.92;
-}
-
-.neon-qr-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.neon-qr-text {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #e5e7ff;
-}
-
-.neon-qr-text strong {
-  color: #ffef9f;
-  font-size: 0.78rem;
-}
-
-.neon-qr img {
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: #050509;
-  box-shadow:
-    0 0 8px rgba(255,255,255,0.25),
-    0 0 14px rgba(255, 239, 159, 0.45);
-}
-
-@media (max-width: 900px) {
-  .neon-qr img {
-    width: 44px;
-    height: 44px;
-  }
-  .neon-qr-text {
-    display: none;
-  }
-}
-/* ---------------------------
-   GLOBAL FONT SCALE-UP
-   --------------------------- */
-body {
-  font-size: 18px; /* base font */
-}
-
-.venue-name {
-  font-size: 1.8rem;
-}
-
-.section-label {
-  font-size: 1.1rem;
-}
-
-.beer-name {
-  font-size: 1.35rem;
-}
-
-.beer-style, .beer-meta-inline, .beer-price {
-  font-size: 1.1rem;
-}
-
-.tap-badge, .featured-tag {
-  font-size: 1rem;
-}
-
-.header-qr-text span,
-.header-qr-text strong,
-.neon-qr-text span,
-.neon-qr-text strong {
-  font-size: 1rem !important;
-}
-
-.ticker-item {
-  font-size: 1.2rem !important;
-}
-
-.ticker-user, .ticker-beer, .ticker-time {
-  font-size: 1.1rem !important;
-}
-
-.small-timestamp {
-  font-size: 0.95rem;
-}
-
-    
   </style>
 </head>
 <body>
   <div class="board">
     <header class="board-header">
-  <div class="venue-name">Funcleson Funkatorium</div>
+      <div class="venue-name">Funcleson Funkatorium</div>
 
-  <div class="header-right">
-    <div class="header-qr-row">
+      <div class="header-right">
+        <div class="header-qr-row">
 
-      <!-- Untappd Check-in QR -->
-      <div class="neon-qr">
-        <div class="neon-qr-inner">
-          <div class="neon-qr-text">
-            <span>Scan to Check In</span>
-
-            
+          <!-- Untappd Check-in QR -->
+          <div class="neon-qr">
+            <div class="neon-qr-inner">
+              <div class="neon-qr-text">
+                <span>Scan to Check In</span>
+                <strong>Untappd Venue</strong>
+              </div>
+              <img src="qr-funcleson.png" alt="QR code to Untappd Venue" />
+            </div>
           </div>
-          <img src="qr-funcleson.png" alt="QR code to Untappd Venue" />
-        </div>
-      </div>
 
-      <!-- Photo Drop QR -->
-      <div class="neon-qr">
-        <div class="neon-qr-inner">
-          <div class="neon-qr-text">
-            <span>Scan to Add Photos to the</span>
-            <strong>Funkatorium</strong>
-            
+          <!-- Photo Drop QR -->
+          <div class="neon-qr">
+            <div class="neon-qr-inner">
+              <div class="neon-qr-text">
+                <span>Scan to Add Photos</span>
+                <strong>Photo Drop</strong>
+              </div>
+              <img src="qr-photodrop.png" alt="QR code for Photo Drop Album" />
+            </div>
           </div>
-          <img src="qr-photodrop.png" alt="QR code for Photo Drop Album" />
+
         </div>
+
+        <span class="section-label">On Tap</span>
+        <span class="small-timestamp" id="boardUpdated"></span>
       </div>
-
-    </div>
-
-    <span class="section-label">On Tap</span>
-    <span class="small-timestamp" id="boardUpdated"></span>
-  </div>
-</header>
-
+    </header>
 
     <main class="board-main">
       <div class="menu-column" id="menuColumnLeft"></div>
@@ -643,59 +485,50 @@ body {
     </footer>
   </div>
 
-<script>
-  // ========= TAP LIST VIA GOOGLE SHEETS =========
-  // 1) Publish your Google Sheet as CSV (File → Share → Publish to web → CSV).
-  // 2) Paste that CSV URL below:
-  const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
+  <script>
+    // ========= TAP LIST VIA GOOGLE SHEETS =========
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
 
-  // Optional: filter by category (exact match). Leave [] to show all categories.
-  // Example: const CATEGORY_FILTERS = ["On Tap", "IPA"];
-  const CATEGORY_FILTERS = [];
+    const CATEGORY_FILTERS = [];
+    let BEERS = [];
 
-  // This will be filled from the sheet:
-  let BEERS = [];
+    const boardUpdated = document.getElementById("boardUpdated");
 
-  const boardUpdated = document.getElementById("boardUpdated");
+    function parseCSV(csv) {
+      const lines = csv.trim().split("\n");
+      if (lines.length < 2) return [];
 
-  // Basic CSV parser (assumes no commas inside fields)
-  function parseCSV(csv) {
-    const lines = csv.trim().split("\n");
-    if (lines.length < 2) return [];
+      const headers = lines[0].split(",").map(h => h.trim());
+      const beers = [];
 
-    const headers = lines[0].split(",").map(h => h.trim());
-    const beers = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].split(",").map(c => c.trim());
-      if (row.length === 1 && row[0] === "") continue; // skip empty rows
-
-      const obj = {};
-      headers.forEach((h, idx) => {
-        obj[h] = row[idx] || "";
-      });
-      beers.push(obj);
-    }
-    return beers;
-  }
-
-  async function fetchBeersFromSheet() {
-    if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes("PASTE_YOUR")) {
-      console.warn("Google Sheet CSV URL is not set.");
-      return;
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(",").map(c => c.trim());
+        if (row.length === 1 && row[0] === "") continue;
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = row[idx] || "";
+        });
+        beers.push(obj);
+      }
+      return beers;
     }
 
-    try {
-      const res = await fetch(GOOGLE_SHEET_CSV_URL);
-      const text = await res.text();
-      BEERS = parseCSV(text);
-      buildMenu();
-    } catch (e) {
-      console.error("Error loading beer sheet:", e);
-    }
-  }
+    async function fetchBeersFromSheet() {
+      if (!GOOGLE_SHEET_CSV_URL) {
+        console.warn("Google Sheet CSV URL is not set.");
+        return;
+      }
 
-  // ========= MENU RENDERING =========
+      try {
+        const res = await fetch(GOOGLE_SHEET_CSV_URL);
+        const text = await res.text();
+        BEERS = parseCSV(text);
+        buildMenu();
+      } catch (e) {
+        console.error("Error loading beer sheet:", e);
+      }
+    }
+
     function buildMenu() {
       const leftCol = document.getElementById("menuColumnLeft");
       const rightCol = document.getElementById("menuColumnRight");
@@ -704,10 +537,8 @@ body {
 
       let beers = [...BEERS];
 
-      // Filter by "active" column
       beers = beers.filter((beer) => {
         const activeStr = (beer.active || beer.Active || "").toString().toLowerCase();
-        // Treat blank as active by default
         const isActive =
           activeStr === "" ||
           activeStr === "true" ||
@@ -716,13 +547,11 @@ body {
           activeStr === "1";
         if (!isActive) return false;
 
-        // Filter by category if CATEGORY_FILTERS is non-empty
         if (CATEGORY_FILTERS.length === 0) return true;
         const cat = (beer.category || beer.Category || "").toString().trim();
         return CATEGORY_FILTERS.includes(cat);
       });
 
-      // Sort by category, then tap number
       beers.sort((a, b) => {
         const ca = (a.category || a.Category || "").toString();
         const cb = (b.category || b.Category || "").toString();
@@ -733,7 +562,6 @@ body {
         return ta - tb;
       });
 
-      // Split into two columns
       const mid = Math.ceil(beers.length / 2);
       const leftBeers = beers.slice(0, mid);
       const rightBeers = beers.slice(mid);
@@ -744,10 +572,8 @@ body {
         list.forEach((beer) => {
           const cat = (beer.category || beer.Category || "").toString().trim();
 
-          // Add category header when category changes
           if (cat && cat !== lastCategory) {
             const header = document.createElement("div");
-            // reuse existing style from header (section-label)
             header.className = "section-label";
             header.textContent = cat;
             container.appendChild(header);
@@ -830,235 +656,234 @@ body {
       }
     }
 
-  // ========= TICKER CONFIG =========
-  const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
-  const REFRESH_MS = 60000; // 60s
-  const MAX_AGE_HOURS = 7000;
+    // ========= TICKER CONFIG =========
+    const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
+    const REFRESH_MS = 60000;
+    const MAX_AGE_HOURS = 7000;
 
-  const tickerTrack = document.getElementById("tickerTrack");
-  const tickerContent = document.getElementById("tickerContent");
-  const statusText = document.getElementById("statusText");
+    const tickerTrack = document.getElementById("tickerTrack");
+    const tickerContent = document.getElementById("tickerContent");
+    const statusText = document.getElementById("statusText");
 
-  function timeAgo(dateString) {
-    const then = new Date(dateString);
-    if (isNaN(then)) return "";
-    const now = new Date();
-    const diffMs = now - then;
-    const minutes = Math.floor(diffMs / 60000);
-    const hours = Math.floor(minutes / 60);
+    function timeAgo(dateString) {
+      const then = new Date(dateString);
+      if (isNaN(then)) return "";
+      const now = new Date();
+      const diffMs = now - then;
+      const minutes = Math.floor(diffMs / 60000);
+      const hours = Math.floor(minutes / 60);
 
-    if (minutes < 1) return "just now";
-    if (minutes < 60) return `${minutes} min ago`;
-    if (hours < 24) return `${hours} hr${hours !== 1 ? "s" : ""} ago`;
-    const days = Math.floor(hours / 24);
-    return `${days} day${days !== 1 ? "s" : ""} ago`;
-  }
-
-  function isRecentEnough(dateString) {
-    const then = new Date(dateString);
-    if (isNaN(then)) return false;
-    const now = new Date();
-    const diffMs = now - then;
-    const hours = diffMs / (1000 * 60 * 60);
-    return hours <= MAX_AGE_HOURS;
-  }
-
-  function cleanBeerName(name) {
-    if (!name) return "";
-    return name.replace(/^(a |an )/i, "").trim();
-  }
-
-  function parseRating(item) {
-    const raw = (item.description || "") + " " + (item.content || "");
-    const text = raw.replace(/<[^>]+>/g, " ");
-
-    let match = text.match(/\(([0-9.]+)\s*\/\s*5/i);
-    if (match) return match[1];
-
-    match = text.match(/([0-9.]+)\s*\/\s*5/i);
-    if (match) return match[1];
-
-    match = text.match(/Rating:\s*([0-9.]+)/i);
-    if (match) return match[1];
-
-    return "";
-  }
-
-  function parseUntappdTitle(title) {
-    let user = "";
-    let beer = "";
-    let brewery = "";
-
-    if (!title) return { user, beer, brewery };
-
-    let base = title;
-    const atIndex = base.toLowerCase().lastIndexOf(" at ");
-    if (atIndex !== -1) base = base.slice(0, atIndex);
-
-    let parts = base.split(" is drinking ");
-    if (parts.length === 1) parts = base.split(" drank ");
-
-    let rest = "";
-    if (parts.length > 1) {
-      user = parts[0].trim();
-      rest = parts[1].trim();
-    } else {
-      rest = base.trim();
+      if (minutes < 1) return "just now";
+      if (minutes < 60) return `${minutes} min ago`;
+      if (hours < 24) return `${hours} hr${hours !== 1 ? "s" : ""} ago`;
+      const days = Math.floor(hours / 24);
+      return `${days} day${days !== 1 ? "s" : ""} ago`;
     }
 
-    let beerCandidate = rest;
-    let breweryCandidate = "";
-
-    const bySplit = rest.split(" by ");
-    if (bySplit.length > 1) {
-      beerCandidate = bySplit[0].trim();
-      breweryCandidate = bySplit.slice(1).join(" by ").trim();
+    function isRecentEnough(dateString) {
+      const then = new Date(dateString);
+      if (isNaN(then)) return false;
+      const now = new Date();
+      const diffMs = now - then;
+      const hours = diffMs / (1000 * 60 * 60);
+      return hours <= MAX_AGE_HOURS;
     }
 
-    if (!breweryCandidate) {
-      const parenMatch = beerCandidate.match(/\(([^)]+)\)\s*$/);
-      if (parenMatch) {
-        breweryCandidate = parenMatch[1].trim();
-        beerCandidate = beerCandidate.replace(/\s*\([^)]+\)\s*$/, "").trim();
-      }
+    function cleanBeerName(name) {
+      if (!name) return "";
+      return name.replace(/^(a |an )/i, "").trim();
     }
 
-    beer = beerCandidate;
-    brewery = breweryCandidate;
+    function parseRating(item) {
+      const raw = (item.description || "") + " " + (item.content || "");
+      const text = raw.replace(/<[^>]+>/g, " ");
 
-    return { user, beer, brewery };
-  }
+      let match = text.match(/\(([0-9.]+)\s*\/\s*5/i);
+      if (match) return match[1];
 
-  function addSeparator(parent) {
-    const dot = document.createElement("span");
-    dot.className = "ticker-separator";
-    dot.textContent = "·";
-    parent.appendChild(dot);
-  }
+      match = text.match(/([0-9.]+)\s*\/\s*5/i);
+      if (match) return match[1];
 
-  function buildTicker(items) {
-    tickerContent.innerHTML = "";
+      match = text.match(/Rating:\s*([0-9.]+)/i);
+      if (match) return match[1];
 
-    if (!items || !items.length) {
-      const span = document.createElement("span");
-      span.className = "ticker-empty";
-      span.textContent = "No recent check-ins.";
-      tickerContent.appendChild(span);
-      return;
+      return "";
     }
 
-    const recentItems = items.filter((item) => isRecentEnough(item.pubDate));
+    function parseUntappdTitle(title) {
+      let user = "";
+      let beer = "";
+      let brewery = "";
 
-    if (!recentItems.length) {
-      const span = document.createElement("span");
-      span.className = "ticker-empty";
-      span.textContent = "No check-ins in the selected time window.";
-      tickerContent.appendChild(span);
-      return;
-    }
+      if (!title) return { user, beer, brewery };
 
-    const maxItems = Math.min(recentItems.length, 10);
+      let base = title;
+      const atIndex = base.toLowerCase().lastIndexOf(" at ");
+      if (atIndex !== -1) base = base.slice(0, atIndex);
 
-    for (let i = 0; i < maxItems; i++) {
-      const item = recentItems[i];
-      const { user, beer, brewery } = parseUntappdTitle(item.title);
+      let parts = base.split(" is drinking ");
+      if (parts.length === 1) parts = base.split(" drank ");
 
-      const cleanBeer = cleanBeerName(beer);
-      const rating = parseRating(item);
-      const time = timeAgo(item.pubDate);
-
-      const itemEl = document.createElement("span");
-      itemEl.className = "ticker-item";
-
-      const userEl = document.createElement("span");
-      userEl.className = "ticker-user";
-      userEl.textContent = user || "Someone";
-
-      const beerEl = document.createElement("span");
-      beerEl.className = "ticker-beer";
-      if (cleanBeer && brewery) {
-        beerEl.textContent = `${cleanBeer} by ${brewery}`;
-      } else if (cleanBeer) {
-        beerEl.textContent = cleanBeer;
+      let rest = "";
+      if (parts.length > 1) {
+        user = parts[0].trim();
+        rest = parts[1].trim();
       } else {
-        beerEl.textContent = "A beer";
+        rest = base.trim();
       }
 
-      const ratingEl = document.createElement("span");
-      ratingEl.className = "ticker-beer";
-      ratingEl.textContent = rating ? `Rated ${rating}/5` : "";
+      let beerCandidate = rest;
+      let breweryCandidate = "";
 
-      const timeEl = document.createElement("span");
-      timeEl.className = "ticker-time";
-      timeEl.textContent = time || "";
-
-      itemEl.appendChild(userEl);
-
-      if (cleanBeer) {
-        addSeparator(itemEl);
-        itemEl.appendChild(beerEl);
+      const bySplit = rest.split(" by ");
+      if (bySplit.length > 1) {
+        beerCandidate = bySplit[0].trim();
+        breweryCandidate = bySplit.slice(1).join(" by ").trim();
       }
 
-      if (rating) {
-        addSeparator(itemEl);
-        itemEl.appendChild(ratingEl);
+      if (!breweryCandidate) {
+        const parenMatch = beerCandidate.match(/\(([^)]+)\)\s*$/);
+        if (parenMatch) {
+          breweryCandidate = parenMatch[1].trim();
+          beerCandidate = beerCandidate.replace(/\s*\([^)]+\)\s*$/, "").trim();
+        }
       }
 
-      if (time) {
-        addSeparator(itemEl);
-        itemEl.appendChild(timeEl);
-      }
+      beer = beerCandidate;
+      brewery = breweryCandidate;
 
-      tickerContent.appendChild(itemEl);
-
-      if (i < maxItems - 1) {
-        const sep = document.createElement("span");
-        sep.className = "ticker-separator";
-        sep.textContent = "·";
-        tickerContent.appendChild(sep);
-      }
+      return { user, beer, brewery };
     }
 
-    const clone = tickerContent.cloneNode(true);
-    tickerTrack.innerHTML = "";
-    tickerTrack.appendChild(tickerContent);
-    tickerTrack.appendChild(clone);
-  }
+    function addSeparator(parent) {
+      const dot = document.createElement("span");
+      dot.className = "ticker-separator";
+      dot.textContent = "·";
+      parent.appendChild(dot);
+    }
 
-  async function fetchCheckins() {
-    try {
-      statusText.textContent = "Updating…";
+    function buildTicker(items) {
+      tickerContent.innerHTML = "";
 
-      const rssUrl = encodeURIComponent(VENUE_RSS_URL);
-      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
-
-      const res = await fetch(apiUrl);
-      if (!res.ok) {
-        statusText.textContent = "Feed error";
+      if (!items || !items.length) {
+        const span = document.createElement("span");
+        span.className = "ticker-empty";
+        span.textContent = "No recent check-ins.";
+        tickerContent.appendChild(span);
         return;
       }
 
-      const data = await res.json();
-      const items = data.items || [];
+      const recentItems = items.filter((item) => isRecentEnough(item.pubDate));
 
-      buildTicker(items);
-      statusText.textContent = "Last updated " + new Date().toLocaleTimeString();
-    } catch (err) {
-      console.error(err);
-      statusText.textContent = "Network error";
+      if (!recentItems.length) {
+        const span = document.createElement("span");
+        span.className = "ticker-empty";
+        span.textContent = "No check-ins in the selected time window.";
+        tickerContent.appendChild(span);
+        return;
+      }
+
+      const maxItems = Math.min(recentItems.length, 10);
+
+      for (let i = 0; i < maxItems; i++) {
+        const item = recentItems[i];
+        const { user, beer, brewery } = parseUntappdTitle(item.title);
+
+        const cleanBeer = cleanBeerName(beer);
+        const rating = parseRating(item);
+        const time = timeAgo(item.pubDate);
+
+        const itemEl = document.createElement("span");
+        itemEl.className = "ticker-item";
+
+        const userEl = document.createElement("span");
+        userEl.className = "ticker-user";
+        userEl.textContent = user || "Someone";
+
+        const beerEl = document.createElement("span");
+        beerEl.className = "ticker-beer";
+        if (cleanBeer && brewery) {
+          beerEl.textContent = `${cleanBeer} by ${brewery}`;
+        } else if (cleanBeer) {
+          beerEl.textContent = cleanBeer;
+        } else {
+          beerEl.textContent = "A beer";
+        }
+
+        const ratingEl = document.createElement("span");
+        ratingEl.className = "ticker-beer";
+        ratingEl.textContent = rating ? `Rated ${rating}/5` : "";
+
+        const timeEl = document.createElement("span");
+        timeEl.className = "ticker-time";
+        timeEl.textContent = time || "";
+
+        itemEl.appendChild(userEl);
+
+        if (cleanBeer) {
+          addSeparator(itemEl);
+          itemEl.appendChild(beerEl);
+        }
+
+        if (rating) {
+          addSeparator(itemEl);
+          itemEl.appendChild(ratingEl);
+        }
+
+        if (time) {
+          addSeparator(itemEl);
+          itemEl.appendChild(timeEl);
+        }
+
+        tickerContent.appendChild(itemEl);
+
+        if (i < maxItems - 1) {
+          const sep = document.createElement("span");
+          sep.className = "ticker-separator";
+          sep.textContent = "·";
+          tickerContent.appendChild(sep);
+        }
+      }
+
+      const clone = tickerContent.cloneNode(true);
+      tickerTrack.innerHTML = "";
+      tickerTrack.appendChild(tickerContent);
+      tickerTrack.appendChild(clone);
     }
-  }
 
-  function startAutoRefresh() {
-    fetchCheckins();
-    setInterval(fetchCheckins, REFRESH_MS);
-  }
+    async function fetchCheckins() {
+      try {
+        statusText.textContent = "Updating…";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    fetchBeersFromSheet();  // load tap list from Google Sheets
-    startAutoRefresh();     // start Untappd ticker
-  });
-</script>
+        const rssUrl = encodeURIComponent(VENUE_RSS_URL);
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
 
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          statusText.textContent = "Feed error";
+          return;
+        }
+
+        const data = await res.json();
+        const items = data.items || [];
+
+        buildTicker(items);
+        statusText.textContent = "Last updated " + new Date().toLocaleTimeString();
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = "Network error";
+      }
+    }
+
+    function startAutoRefresh() {
+      fetchCheckins();
+      setInterval(fetchCheckins, REFRESH_MS);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchBeersFromSheet();
+      startAutoRefresh();
+    });
+  </script>
 </body>
 </html>
