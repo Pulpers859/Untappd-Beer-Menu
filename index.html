@@ -24,8 +24,7 @@
       padding: 0;
     }
 
-    html,
-    body {
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -34,6 +33,17 @@
       background: var(--bg-main);
       color: var(--text-main);
     }
+
+  html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.frame {
+  height: 100vh;
+  width: 100%;
+}
 
     body {
       display: flex;
@@ -204,7 +214,24 @@
       border: 1px solid #20222c;
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
     }
+    
+    /* ---------------------------
+       FORCE TICKER TO BOTTOM
+       --------------------------- */
+    .ticker-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
 
+    .ticker-bar {
+      height: 52px; /* slightly taller */
+      display: flex;
+      align-items: center;
+    }
+
+    
     .ticker-label {
       flex-shrink: 0;
       padding: 6px 12px;
@@ -498,6 +525,53 @@
     display: none;
   }
 }
+/* ---------------------------
+   GLOBAL FONT SCALE-UP
+   --------------------------- */
+body {
+  font-size: 18px; /* base font */
+}
+
+.venue-name {
+  font-size: 1.8rem;
+}
+
+.section-label {
+  font-size: 1.1rem;
+}
+
+.beer-name {
+  font-size: 1.35rem;
+}
+
+.beer-style, .beer-meta-inline, .beer-price {
+  font-size: 1.1rem;
+}
+
+.tap-badge, .featured-tag {
+  font-size: 1rem;
+}
+
+.header-qr-text span,
+.header-qr-text strong,
+.neon-qr-text span,
+.neon-qr-text strong {
+  font-size: 1rem !important;
+}
+
+.ticker-item {
+  font-size: 1.2rem !important;
+}
+
+.ticker-user, .ticker-beer, .ticker-time {
+  font-size: 1.1rem !important;
+}
+
+.small-timestamp {
+  font-size: 0.95rem;
+}
+
+    
   </style>
 </head>
 <body>
