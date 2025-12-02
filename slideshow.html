@@ -66,12 +66,12 @@
 
   <script>
     // 🔧 CONFIG: change these to match your repo
-    const GITHUB_USER = "Pulpers859";            // your GitHub username
-    const REPO_NAME   = "Funcleson-Photo-Drop-Board"; // or your beer menu repo name
-    const BRANCH      = "main";                 // usually "main" or "master"
-    const PHOTOS_DIR  = "photos";               // folder inside the repo
+    const GITHUB_USER = "Pulpers859";
+    const REPO_NAME   = "Untappd-Beer-Menu";
+    const BRANCH      = "main";        // or "gh-pages" if your site uses that
+    const PHOTOS_DIR  = "photos";
 
-    const SLIDE_DURATION_MS = 10000; // 10 seconds per image
+    const SLIDE_DURATION_MS = 5000; // 50 seconds per image
 
     const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${PHOTOS_DIR}?ref=${BRANCH}`;
 
