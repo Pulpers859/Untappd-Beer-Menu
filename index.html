@@ -334,69 +334,56 @@
   font-size: 0.95rem;
 }
 
-/* --- Pixel/glitch-ish card transition --- */
+/* --- Smooth morph-style transition (PowerPoint vibe) --- */
 .ticker-card--incoming {
   opacity: 0;
+  transform: translateY(20px) scale(0.96);
+  filter: blur(6px);
 }
 
 .ticker-card--animate-in {
-  animation: tickerGlitchIn 0.5s steps(5, end) forwards;
+  animation: tickerMorphIn 0.7s ease-in-out forwards;
 }
 
 .ticker-card--outgoing {
-  animation: tickerGlitchOut 0.5s steps(5, end) forwards;
+  animation: tickerMorphOut 0.7s ease-in-out forwards;
 }
 
-/* Outgoing: deteriorates downward in chunky steps */
-@keyframes tickerGlitchOut {
+/* Outgoing: gently floats up + shrinks + soft blur */
+@keyframes tickerMorphOut {
   0% {
     opacity: 1;
-    clip-path: inset(0 0 0 0);
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
-  25% {
-    clip-path: inset(20% 0 0 0);
-    transform: translateY(2px);
-  }
-  50% {
-    clip-path: inset(45% 0 0 0);
-    transform: translateY(4px);
-  }
-  75% {
-    clip-path: inset(70% 0 0 0);
-    transform: translateY(6px);
+  40% {
+    opacity: 0.8;
+    transform: translateY(-6px) scale(0.99);
+    filter: blur(2px);
   }
   100% {
     opacity: 0;
-    clip-path: inset(100% 0 0 0);
-    transform: translateY(8px);
+    transform: translateY(-14px) scale(0.96);
+    filter: blur(6px);
   }
 }
 
-/* Incoming: builds up from bottom in chunky steps */
-@keyframes tickerGlitchIn {
+/* Incoming: drifts up slightly into place from below, sharpening as it arrives */
+@keyframes tickerMorphIn {
   0% {
     opacity: 0;
-    clip-path: inset(100% 0 0 0);
-    transform: translateY(8px);
+    transform: translateY(14px) scale(1.03);
+    filter: blur(6px);
   }
-  25% {
+  60% {
     opacity: 1;
-    clip-path: inset(70% 0 0 0);
-    transform: translateY(6px);
-  }
-  50% {
-    clip-path: inset(45% 0 0 0);
-    transform: translateY(4px);
-  }
-  75% {
-    clip-path: inset(20% 0 0 0);
-    transform: translateY(2px);
+    transform: translateY(-3px) scale(1.01);
+    filter: blur(2px);
   }
   100% {
     opacity: 1;
-    clip-path: inset(0 0 0 0);
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
 }
 
