@@ -424,7 +424,80 @@
   }
 }
 
-    
+    /* Dual QR container */
+.header-qr-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Reusable neon QR block */
+.neon-qr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top left, #ffef9f 0%, #ff6bd5 40%, #4fd1ff 80%, #1b1b2f 100%);
+  position: relative;
+  overflow: hidden;
+  animation: qrGlow 4.5s ease-in-out infinite;
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.4),
+    0 0 18px rgba(255, 107, 213, 0.55),
+    0 0 26px rgba(79, 209, 255, 0.55);
+}
+
+.neon-qr::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 999px;
+  background: #080814;
+  opacity: 0.92;
+}
+
+.neon-qr-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.neon-qr-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #e5e7ff;
+}
+
+.neon-qr-text strong {
+  color: #ffef9f;
+  font-size: 0.78rem;
+}
+
+.neon-qr img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #050509;
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.25),
+    0 0 14px rgba(255, 239, 159, 0.45);
+}
+
+@media (max-width: 900px) {
+  .neon-qr img {
+    width: 44px;
+    height: 44px;
+  }
+  .neon-qr-text {
+    display: none;
+  }
+}
   </style>
 </head>
 <body>
@@ -433,20 +506,39 @@
   <div class="venue-name">Funcleson Funkatorium</div>
 
   <div class="header-right">
-    <div class="header-qr">
-      <div class="header-qr-inner">
-        <div class="header-qr-text">
-          <span>Scan to Check In</span>
+    <div class="header-qr-row">
 
+      <!-- Untappd Check-in QR -->
+      <div class="neon-qr">
+        <div class="neon-qr-inner">
+          <div class="neon-qr-text">
+            <span>Scan to Check In</span>
+            <strong>Funcleson Funkatorium</strong>
+            <span>Untappd Venue</span>
+          </div>
+          <img src="qr-funcleson.png" alt="QR code to Untappd Venue" />
         </div>
-        <img src="qr-funcleson.png" alt="QR code to Funcleson Funkatorium on Untappd" />
       </div>
+
+      <!-- Photo Drop QR -->
+      <div class="neon-qr">
+        <div class="neon-qr-inner">
+          <div class="neon-qr-text">
+            <span>Drop Photos</span>
+            <strong>Funcleson Funkatorium</strong>
+            <span>Shared Album</span>
+          </div>
+          <img src="qr-photodrop.png" alt="QR code for Photo Drop Album" />
+        </div>
+      </div>
+
     </div>
 
     <span class="section-label">On Tap</span>
     <span class="small-timestamp" id="boardUpdated"></span>
   </div>
 </header>
+
 
     <main class="board-main">
       <div class="menu-column" id="menuColumnLeft"></div>
