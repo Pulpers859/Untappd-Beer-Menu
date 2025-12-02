@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Funcleson Brewery Slideshow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    #slideshow-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    .slide-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;          /* fill screen like a poster */
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .slide-img.active {
+      opacity: 1;
+    }
+
+    #loading {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    #error {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ff7777;
+      font-size: 0.9rem;
+      text-align: center;
+      max-width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <div id="slideshow-container">
+    <div id="loading">Loading Funcleson photos…</div>
+    <div id="error"></div>
+  </div>
+
+  <script>
+    // 🔧 CONFIG: change these to match your repo
+    const GITHUB_USER = "Pulpers859";            // your GitHub username
+    const REPO_NAME   = "Funcleson-Photo-Drop-Board"; // or your beer menu repo name
+    const BRANCH      = "main";                 // usually "main" or "master"
+    const PHOTOS_DIR  = "photos";               // folder inside the repo
+
+    const SLIDE_DURATION_MS = 10000; // 10 seconds per image
+
+    const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${PHOTOS_DIR}?ref=${BRANCH}`;
+
+    const container = document.getElementById("slideshow-container");
+    const loadingEl = document.getElementById("loading");
+    const errorEl   = document.getElementById("error");
+
+    async function fetchPhotos() {
+      try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          throw new Error(`GitHub API error (${res.status})`);
+        }
+        const data = await res.json();
+
+        // Filter only image files
+        const imageFiles = data.filter(item => {
+          if (!item.name) return false;
+          const lower = item.name.toLowerCase();
+          return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".gif") || lower.endsWith(".webp");
+        });
+
+        if (!imageFiles.length) {
+          throw new Error("No images found in /" + PHOTOS_DIR);
+        }
+
+        // Build raw URLs for each image
+        const imageUrls = imageFiles.map(file =>
+          `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/${PHOTOS_DIR}/${encodeURIComponent(file.name)}`
+        );
+
+        initSlideshow(imageUrls);
+      } catch (err) {
+        console.error(err);
+        loadingEl.style.display = "none";
+        errorEl.textContent = "Could not load photos. Check your GitHub config or /photos folder.";
+      }
+    }
+
+    function initSlideshow(urls) {
+      loadingEl.style.display = "none";
+
+      let currentIndex = 0;
+      const slides = [];
+
+      urls.forEach((url, idx) => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.className = "slide-img";
+        if (idx === 0) {
+          img.classList.add("active");
+        }
+        container.appendChild(img);
+        slides.push(img);
+      });
+
+      if (slides.length === 0) {
+        errorEl.textContent = "No valid images to display.";
+        return;
+      }
+
+      setInterval(() => {
+        slides[currentIndex].classList.remove("active");
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add("active");
+      }, SLIDE_DURATION_MS);
+    }
+
+    fetchPhotos();
+  </script>
+</body>
+</html>
