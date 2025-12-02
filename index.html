@@ -315,17 +315,139 @@
         display: none;
       }
     }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Neon QR block */
+.header-qr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top left, #ffef9f 0%, #ff6bd5 40%, #4fd1ff 80%, #1b1b2f 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.4),
+    0 0 18px rgba(255, 107, 213, 0.55),
+    0 0 26px rgba(79, 209, 255, 0.55);
+}
+
+.header-qr::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  background: #080814;
+  opacity: 0.9;
+}
+
+.header-qr-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-qr-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #e5e7ff;
+}
+
+.header-qr-text span:first-child {
+  opacity: 0.85;
+}
+
+.header-qr-text strong {
+  color: #ffef9f;
+  font-size: 0.8rem;
+}
+
+.header-qr-text span:last-child {
+  font-size: 0.65rem;
+  color: #a9b0ff;
+}
+
+.header-qr img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #050509;
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.25),
+    0 0 14px rgba(255, 239, 159, 0.45);
+}
+
+/* Subtle neon shimmer */
+@keyframes qrGlow {
+  0% {
+    box-shadow:
+      0 0 8px rgba(255, 255, 255, 0.4),
+      0 0 18px rgba(255, 107, 213, 0.55),
+      0 0 26px rgba(79, 209, 255, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(255, 255, 255, 0.6),
+      0 0 24px rgba(255, 107, 213, 0.8),
+      0 0 32px rgba(79, 209, 255, 0.8);
+  }
+  100% {
+    box-shadow:
+      0 0 8px rgba(255, 255, 255, 0.4),
+      0 0 18px rgba(255, 107, 213, 0.55),
+      0 0 26px rgba(79, 209, 255, 0.55);
+  }
+}
+
+.header-qr {
+  animation: qrGlow 4.5s ease-in-out infinite;
+}
+
+@media (max-width: 900px) {
+  .header-qr img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .header-qr-text {
+    display: none; /* hide text on tiny screens */
+  }
+}
+
+    
   </style>
 </head>
 <body>
   <div class="board">
     <header class="board-header">
-      <div class="venue-name">Funcleson Funkatorium</div>
-      <div class="header-right">
-        <span class="section-label">On Tap</span>
-        <span class="small-timestamp" id="boardUpdated"></span>
+  <div class="venue-name">Funcleson Funkatorium</div>
+
+  <div class="header-right">
+    <div class="header-qr">
+      <div class="header-qr-inner">
+        <div class="header-qr-text">
+          <span>Scan to Check In</span>
+          <strong>Funcleson Funkatorium</strong>
+          <span>Untappd Venue</span>
+        </div>
+        <img src="qr-funcleson.png" alt="QR code to Funcleson Funkatorium on Untappd" />
       </div>
-    </header>
+    </div>
+
+    <span class="section-label">On Tap</span>
+    <span class="small-timestamp" id="boardUpdated"></span>
+  </div>
+</header>
 
     <main class="board-main">
       <div class="menu-column" id="menuColumnLeft"></div>
