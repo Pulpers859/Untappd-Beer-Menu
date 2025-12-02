@@ -58,41 +58,56 @@
     }
 
     /* === HEADER === */
-    .board-header {
-      flex: 0 0 auto;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #101119;
-      border-bottom: 1px solid var(--divider);
-    }
+.board-header {
+  flex: 0 0 auto;
+  padding: 12px 20px 10px;
+  display: flex;
+  flex-direction: column;       /* stack vertically */
+  align-items: center;          /* center horizontally */
+  justify-content: center;
+  gap: 8px;
+  background: #101119;
+  border-bottom: 1px solid var(--divider);
+}
 
-    .venue-name {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent-yellow-soft);
-    }
+.venue-name {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-yellow-soft);
+  text-align: center;           /* ensure centered text */
+}
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
+/* Right side now becomes a centered column under the title */
+.header-right {
+  display: flex;
+  flex-direction: column;       /* QR row, then "On Tap" row */
+  align-items: center;
+  gap: 6px;
+}
 
-    .section-label {
-      font-size: 1.1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-soft);
-    }
+/* QR row centered under the venue name */
+.header-qr-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;      /* center horizontally */
+  gap: 20px;
+}
 
-    .small-timestamp {
-      font-size: 1rem;
-      color: var(--text-muted);
-    }
+/* Keep these as-is or tweak if you want them bigger/smaller */
+.section-label {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-soft);
+}
+
+.small-timestamp {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
 
     /* === MAIN MENU AREA === */
     .board-main {
@@ -187,111 +202,113 @@
     }
 
     /* === FOOTER TICKER === */
-    .board-footer {
-      flex: 0 0 auto;
-      padding: 10px 18px 12px 18px;
-      background: #101119;
-      border-top: 1px solid var(--divider);
-    }
+.board-footer {
+  flex: 0 0 auto;
+  padding: 16px 18px 18px 18px; /* a bit taller to fit bigger ticker */
+  background: #101119;
+  border-top: 1px solid var(--divider);
+}
 
-    .ticker-shell {
-      width: 100%;
-      background: var(--bg-strip);
-      border-radius: 6px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border: 1px solid #20222c;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
-    }
+.ticker-shell {
+  width: 100%;
+  background: var(--bg-strip);
+  border-radius: 10px;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border: 1px solid #20222c;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
 
-    .ticker-label {
-      flex-shrink: 0;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(244, 196, 48, 0.9);
-      background: rgba(244, 196, 48, 0.12);
-      font-size: 0.95rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent-yellow-soft);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
+/* ~3x larger label */
+.ticker-label {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 196, 48, 0.9);
+  background: rgba(244, 196, 48, 0.12);
+  font-size: 2.7rem;            /* was 0.95rem */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-yellow-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
 
-    .ticker-label-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent-yellow);
-    }
+.ticker-label-dot {
+  width: 16px;                  /* was 8px */
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-yellow);
+}
 
-    .ticker-window {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      height: 40px;
-    }
+.ticker-window {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 120px;                /* was 40px */
+}
 
-    .ticker-track {
-      position: absolute;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      will-change: transform;
-      animation: scroll 45s linear infinite;
-    }
+.ticker-track {
+  position: absolute;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  will-change: transform;
+  animation: scroll 45s linear infinite;
+}
 
-    .ticker-content {
-      display: inline-flex;
-      align-items: center;
-      gap: 1.8rem;
-      font-size: 1.2rem;
-      color: var(--text-main);
-    }
+.ticker-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4.5rem;                  /* scaled gap */
+  font-size: 3.6rem;            /* was 1.2rem */
+  color: var(--text-main);
+}
 
-    .ticker-item {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.35rem;
-      font-size: 1.2rem;
-    }
+.ticker-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 3.6rem;            /* was 1.2rem */
+}
 
-    .ticker-user {
-      font-weight: 600;
-      color: var(--accent-yellow);
-      font-size: 1.1rem;
-    }
+.ticker-user {
+  font-weight: 600;
+  color: var(--accent-yellow);
+  font-size: 3.3rem;            /* was 1.1rem */
+}
 
-    .ticker-beer {
-      font-weight: 600;
-      color: var(--text-main);
-      font-size: 1.1rem;
-    }
+.ticker-beer {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 3.3rem;            /* was 1.1rem */
+}
 
-    .ticker-time {
-      font-size: 1rem;
-      color: var(--text-muted);
-    }
+.ticker-time {
+  font-size: 3rem;              /* was 1rem */
+  color: var(--text-muted);
+}
 
-    .ticker-separator {
-      font-size: 1rem;
-      color: var(--text-muted);
-    }
+.ticker-separator {
+  font-size: 3rem;              /* was 1rem */
+  color: var(--text-muted);
+}
 
-    .ticker-empty {
-      font-size: 1.1rem;
-      color: var(--text-soft);
-    }
+.ticker-empty {
+  font-size: 3.3rem;            /* was 1.1rem */
+  color: var(--text-soft);
+}
 
-    .status-pill {
-      flex-shrink: 0;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
+.status-pill {
+  flex-shrink: 0;
+  font-size: 2.7rem;            /* was 0.95rem */
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 
     @keyframes scroll {
       from {
