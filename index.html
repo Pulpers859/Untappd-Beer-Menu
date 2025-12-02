@@ -201,10 +201,10 @@
       margin-left: 6px;
     }
 
-    /* === FOOTER TICKER === */
+   /* === FOOTER TICKER === */
 .board-footer {
   flex: 0 0 auto;
-  padding: 16px 18px 18px 18px; /* a bit taller to fit bigger ticker */
+  padding: 16px 18px 18px 18px;
   background: #101119;
   border-top: 1px solid var(--divider);
 }
@@ -221,103 +221,143 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
 }
 
-/* ~3x larger label */
+/* Bigger label on the left */
 .ticker-label {
   flex-shrink: 0;
   padding: 10px 18px;
   border-radius: 999px;
   border: 1px solid rgba(244, 196, 48, 0.9);
   background: rgba(244, 196, 48, 0.12);
-  font-size: 2.7rem;            /* was 0.95rem */
+  font-size: 1.4rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-yellow-soft);
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.6rem;
 }
 
 .ticker-label-dot {
-  width: 16px;                  /* was 8px */
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--accent-yellow);
 }
 
+/* 3D flip window */
 .ticker-window {
   flex: 1;
   overflow: hidden;
   position: relative;
-  height: 120px;                /* was 40px */
+  height: 120px;         /* adjust up/down if needed */
+  perspective: 1000px;   /* enables 3D effect */
 }
 
 .ticker-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Each "card" is a single check-in */
+.ticker-card {
   position: absolute;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  will-change: transform;
-  animation: scroll 45s linear infinite;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
+  transform-origin: center center;
+  backface-visibility: hidden;
 }
 
-.ticker-content {
-  display: inline-flex;
-  align-items: center;
-  gap: 4.5rem;                  /* scaled gap */
-  font-size: 3.6rem;            /* was 1.2rem */
-  color: var(--text-main);
-}
-
-.ticker-item {
+.ticker-line-main {
   display: inline-flex;
   align-items: baseline;
-  gap: 1rem;
-  font-size: 3.6rem;            /* was 1.2rem */
+  gap: 0.5rem;
+  font-size: 2.4rem;
+}
+
+.ticker-line-sub {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.6rem;
+  color: var(--text-muted);
 }
 
 .ticker-user {
   font-weight: 600;
   color: var(--accent-yellow);
-  font-size: 3.3rem;            /* was 1.1rem */
 }
 
 .ticker-beer {
   font-weight: 600;
   color: var(--text-main);
-  font-size: 3.3rem;            /* was 1.1rem */
+}
+
+.ticker-rating {
+  font-weight: 500;
+  color: var(--accent-yellow-soft);
 }
 
 .ticker-time {
-  font-size: 3rem;              /* was 1rem */
   color: var(--text-muted);
 }
 
 .ticker-separator {
-  font-size: 3rem;              /* was 1rem */
   color: var(--text-muted);
 }
 
 .ticker-empty {
-  font-size: 3.3rem;            /* was 1.1rem */
+  font-size: 2rem;
   color: var(--text-soft);
 }
 
+/* Status text on the right */
 .status-pill {
   flex-shrink: 0;
-  font-size: 2.7rem;            /* was 0.95rem */
+  font-size: 1.1rem;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
+/* --- 3D flip states --- */
+.ticker-card--incoming {
+  transform: rotateX(-90deg);
+  opacity: 0;
+}
 
-    @keyframes scroll {
-      from {
-        transform: translateX(0);
-      }
-      to {
-        transform: translateX(-50%);
-      }
-    }
+.ticker-card--animate-in {
+  animation: tickerFlipIn 0.7s ease-out forwards;
+}
+
+.ticker-card--outgoing {
+  animation: tickerFlipOut 0.7s ease-in forwards;
+}
+
+@keyframes tickerFlipIn {
+  0% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes tickerFlipOut {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+}
+
 
     /* === QR BLOCKS (dual neon) === */
     .header-qr-row {
@@ -674,13 +714,18 @@
     }
 
     // ========= TICKER CONFIG =========
-    const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
-    const REFRESH_MS = 60000;
-    const MAX_AGE_HOURS = 7000;
+const VENUE_RSS_URL = "https://untappd.com/rss/venue/9899874";
+const REFRESH_MS = 60000;
+const MAX_AGE_HOURS = 7000;
 
-    const tickerTrack = document.getElementById("tickerTrack");
-    const tickerContent = document.getElementById("tickerContent");
-    const statusText = document.getElementById("statusText");
+const tickerTrack = document.getElementById("tickerTrack");
+const tickerContent = document.getElementById("tickerContent");
+const statusText = document.getElementById("statusText");
+
+// NEW: state for the flip-card carousel
+let tickerData = [];
+let tickerIndex = 0;
+let tickerRotationTimer = null;
 
     function timeAgo(dateString) {
       const then = new Date(dateString);
@@ -780,93 +825,131 @@
     }
 
     function buildTicker(items) {
-      tickerContent.innerHTML = "";
+  // Clear existing cards & timers
+  tickerTrack.innerHTML = "";
+  if (tickerRotationTimer) {
+    clearInterval(tickerRotationTimer);
+    tickerRotationTimer = null;
+  }
 
-      if (!items || !items.length) {
-        const span = document.createElement("span");
-        span.className = "ticker-empty";
-        span.textContent = "No recent check-ins.";
-        tickerContent.appendChild(span);
-        return;
+  // No items at all
+  if (!items || !items.length) {
+    renderEmptyTicker("No recent check-ins.");
+    return;
+  }
+
+  // Filter by age
+  const recentItems = items.filter((item) => isRecentEnough(item.pubDate));
+
+  if (!recentItems.length) {
+    renderEmptyTicker("No check-ins in the selected time window.");
+    return;
+  }
+
+  // Keep a reasonable number to loop through
+  const maxItems = Math.min(recentItems.length, 20);
+  tickerData = recentItems.slice(0, maxItems);
+  tickerIndex = 0;
+
+  // Show first card immediately
+  renderTickerCard(tickerData[tickerIndex], true);
+
+  // Rotate through the rest
+  if (tickerData.length > 1) {
+    tickerRotationTimer = setInterval(() => {
+      tickerIndex = (tickerIndex + 1) % tickerData.length;
+      renderTickerCard(tickerData[tickerIndex], false);
+    }, 8000); // 8 seconds per "die face" – tweak if you want slower/faster
+  }
+}
+
+    function renderEmptyTicker(message) {
+  const card = document.createElement("div");
+  card.className = "ticker-card";
+  card.innerHTML = `
+    <div class="ticker-line-main">
+      <span class="ticker-empty">${message}</span>
+    </div>
+  `;
+  tickerTrack.appendChild(card);
+}
+
+function renderTickerCard(item, immediate) {
+  const { user, beer, brewery } = parseUntappdTitle(item.title);
+  const cleanBeer = cleanBeerName(beer);
+  const rating = parseRating(item);
+  const time = timeAgo(item.pubDate);
+
+  const oldCard = tickerTrack.querySelector(".ticker-card");
+
+  const newCard = document.createElement("div");
+  newCard.className = "ticker-card";
+  newCard.innerHTML = `
+    <div class="ticker-line-main">
+      <span class="ticker-user">${user || "Someone"}</span>
+      ${cleanBeer ? '<span class="ticker-separator">·</span>' : ""}
+      ${
+        cleanBeer
+          ? `<span class="ticker-beer">${cleanBeer}${
+              brewery ? " by " + brewery : ""
+            }</span>`
+          : ""
       }
-
-      const recentItems = items.filter((item) => isRecentEnough(item.pubDate));
-
-      if (!recentItems.length) {
-        const span = document.createElement("span");
-        span.className = "ticker-empty";
-        span.textContent = "No check-ins in the selected time window.";
-        tickerContent.appendChild(span);
-        return;
+    </div>
+    <div class="ticker-line-sub">
+      ${
+        rating
+          ? `<span class="ticker-rating">Rated ${rating}/5</span>`
+          : ""
       }
-
-      const maxItems = Math.min(recentItems.length, 10);
-
-      for (let i = 0; i < maxItems; i++) {
-        const item = recentItems[i];
-        const { user, beer, brewery } = parseUntappdTitle(item.title);
-
-        const cleanBeer = cleanBeerName(beer);
-        const rating = parseRating(item);
-        const time = timeAgo(item.pubDate);
-
-        const itemEl = document.createElement("span");
-        itemEl.className = "ticker-item";
-
-        const userEl = document.createElement("span");
-        userEl.className = "ticker-user";
-        userEl.textContent = user || "Someone";
-
-        const beerEl = document.createElement("span");
-        beerEl.className = "ticker-beer";
-        if (cleanBeer && brewery) {
-          beerEl.textContent = `${cleanBeer} by ${brewery}`;
-        } else if (cleanBeer) {
-          beerEl.textContent = cleanBeer;
-        } else {
-          beerEl.textContent = "A beer";
-        }
-
-        const ratingEl = document.createElement("span");
-        ratingEl.className = "ticker-beer";
-        ratingEl.textContent = rating ? `Rated ${rating}/5` : "";
-
-        const timeEl = document.createElement("span");
-        timeEl.className = "ticker-time";
-        timeEl.textContent = time || "";
-
-        itemEl.appendChild(userEl);
-
-        if (cleanBeer) {
-          addSeparator(itemEl);
-          itemEl.appendChild(beerEl);
-        }
-
-        if (rating) {
-          addSeparator(itemEl);
-          itemEl.appendChild(ratingEl);
-        }
-
-        if (time) {
-          addSeparator(itemEl);
-          itemEl.appendChild(timeEl);
-        }
-
-        tickerContent.appendChild(itemEl);
-
-        if (i < maxItems - 1) {
-          const sep = document.createElement("span");
-          sep.className = "ticker-separator";
-          sep.textContent = "·";
-          tickerContent.appendChild(sep);
-        }
+      ${
+        rating && time
+          ? '<span class="ticker-separator">·</span>'
+          : ""
       }
+      ${time ? `<span class="ticker-time">${time}</span>` : ""}
+    </div>
+  `;
 
-      const clone = tickerContent.cloneNode(true);
-      tickerTrack.innerHTML = "";
-      tickerTrack.appendChild(tickerContent);
-      tickerTrack.appendChild(clone);
-    }
+  // First render or no previous card: just show it
+  if (immediate || !oldCard) {
+    tickerTrack.innerHTML = "";
+    tickerTrack.appendChild(newCard);
+    return;
+  }
+
+  // Prepare the new card as "incoming" (above, ready to tumble down)
+  newCard.classList.add("ticker-card--incoming");
+  tickerTrack.appendChild(newCard);
+
+  // Next frame, add animation classes so it tumbles like a die face
+  requestAnimationFrame(() => {
+    oldCard.classList.add("ticker-card--outgoing");
+    newCard.classList.add("ticker-card--animate-in");
+  });
+
+  // Clean up after animation
+  oldCard.addEventListener(
+    "animationend",
+    () => {
+      if (oldCard.parentNode === tickerTrack) {
+        tickerTrack.removeChild(oldCard);
+      }
+    },
+    { once: true }
+  );
+
+  newCard.addEventListener(
+    "animationend",
+    () => {
+      newCard.classList.remove(
+        "ticker-card--incoming",
+        "ticker-card--animate-in"
+      );
+    },
+    { once: true }
+  );
+}
 
     async function fetchCheckins() {
       try {
