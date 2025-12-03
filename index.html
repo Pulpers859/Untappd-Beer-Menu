@@ -44,6 +44,7 @@
     }
 
     .board {
+      position: relative;          /* so we can absolutely position the photo window */
       flex: 1 1 auto;
       width: 100%;
       height: 100vh;           /* fill vertical screen */
@@ -80,7 +81,6 @@
       text-align: center;           /* ensure centered text */
     }
 
-    /* Right side now becomes a centered column under the title */
     .header-right {
       display: flex;
       flex-direction: column;       /* QR row, then button, then "On Tap" row */
@@ -88,7 +88,6 @@
       gap: 6px;
     }
 
-    /* QR row centered under the venue name */
     .header-qr-row {
       display: flex;
       align-items: center;
@@ -464,7 +463,7 @@
       }
     }
 
-    /* === TV NAV BUTTON (Beer Menu → Slideshow) === */
+    /* === TV NAV BUTTON (Beer Menu → Slideshow page, mostly for desktop/phone) === */
     .tv-nav-btn {
       margin-top: 6px;
       padding: 0.5rem 1.1rem;
@@ -490,6 +489,51 @@
       box-shadow: 0 0 14px rgba(244, 196, 48, 0.6);
     }
 
+    /* === PHOTO PIP WINDOW (bottom-right above ticker) === */
+    .photo-pip {
+      position: absolute;
+      right: 24px;
+      bottom: 120px; /* roughly on top of ticker shell */
+      width: 260px;
+      height: 150px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #050509;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 0 10px rgba(0, 0, 0, 0.9),
+        0 0 14px rgba(79, 209, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .photo-pip img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+
+    .photo-pip img.photo-pip-active {
+      opacity: 1;
+    }
+
+    .photo-pip-label {
+      position: absolute;
+      left: 8px;
+      bottom: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      background: rgba(0, 0, 0, 0.7);
+      color: #e5e7ff;
+    }
+
     @media (max-width: 900px) {
       .board {
         max-height: none;
@@ -513,6 +557,10 @@
 
       .ticker-label {
         display: none;
+      }
+
+      .photo-pip {
+        display: none; /* hide the pip on very small screens */
       }
     }
   </style>
@@ -549,8 +597,8 @@
 
         </div>
 
-        <!-- Button to go to slideshow.html -->
-        <a href="slideshow.html" class="tv-nav-btn" id="slideshowBtn">
+        <!-- Desktop/phone button to full slideshow page (FireTV will just ignore) -->
+        <a href="slideshow.html" class="tv-nav-btn">
           📸 View Brewery Photo Slideshow
         </a>
 
@@ -563,6 +611,12 @@
       <div class="menu-column" id="menuColumnLeft"></div>
       <div class="menu-column" id="menuColumnRight"></div>
     </main>
+
+    <!-- PHOTO PIP WINDOW -->
+    <div class="photo-pip" id="photoPip">
+      <span class="photo-pip-label">Live Photos</span>
+      <!-- Images are injected here by JS -->
+    </div>
 
     <footer class="board-footer">
       <div class="ticker-shell">
@@ -1010,33 +1064,73 @@
       setInterval(fetchCheckins, REFRESH_MS);
     }
 
-    // 🔑 FireTV-friendly: focus the button & use OK/Enter to open slideshow
-    function setupTvNav() {
-      const btn = document.getElementById("slideshowBtn");
-      if (btn) {
-        btn.setAttribute("tabindex", "0");
-        try {
-          btn.focus();
-        } catch (e) {
-          // some environments ignore focus(), that's fine
-        }
-      }
+    // ========= SMALL PHOTO PIP SLIDESHOW (bottom-right) =========
+    const PHOTO_USER   = "Pulpers859";
+    const PHOTO_REPO   = "Untappd-Beer-Menu";
+    const PHOTO_BRANCH = "main";     // ⚠️ change to "gh-pages" if that's your Pages branch
+    const PHOTO_DIR    = "photos";
+    const PHOTO_INTERVAL_MS = 10000; // 10 seconds per photo
 
-      document.addEventListener("keydown", (e) => {
-        const key = e.key || e.code;
-        if (key === "Enter" || key === " " || key === "Space") {
-          const b = document.getElementById("slideshowBtn");
-          if (b && b.href) {
-            window.location.href = b.href;
-          }
+    async function initPhotoPip() {
+      const pip = document.getElementById("photoPip");
+      if (!pip) return;
+
+      const apiUrl = `https://api.github.com/repos/${PHOTO_USER}/${PHOTO_REPO}/contents/${PHOTO_DIR}?ref=${PHOTO_BRANCH}`;
+
+      try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          console.warn("Photo PIP: GitHub API error", res.status);
+          return;
         }
-      });
+
+        const data = await res.json();
+        const imageFiles = data.filter(item => {
+          if (!item.name) return false;
+          const lower = item.name.toLowerCase();
+          return lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
+                 lower.endsWith(".png") || lower.endsWith(".gif") ||
+                 lower.endsWith(".webp");
+        });
+
+        if (!imageFiles.length) {
+          console.warn("Photo PIP: no images found in /" + PHOTO_DIR);
+          return;
+        }
+
+        const urls = imageFiles.map(file =>
+          `https://raw.githubusercontent.com/${PHOTO_USER}/${PHOTO_REPO}/${PHOTO_BRANCH}/${PHOTO_DIR}/${encodeURIComponent(file.name)}`
+        );
+
+        // Create img elements
+        pip.querySelectorAll("img").forEach(img => img.remove());
+
+        const imgs = urls.map((url, idx) => {
+          const img = document.createElement("img");
+          img.src = url;
+          if (idx === 0) img.classList.add("photo-pip-active");
+          pip.appendChild(img);
+          return img;
+        });
+
+        if (imgs.length <= 1) return;
+
+        let current = 0;
+        setInterval(() => {
+          const prev = current;
+          current = (current + 1) % imgs.length;
+          imgs[prev].classList.remove("photo-pip-active");
+          imgs[current].classList.add("photo-pip-active");
+        }, PHOTO_INTERVAL_MS);
+      } catch (err) {
+        console.error("Photo PIP error:", err);
+      }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       fetchBeersFromSheet();
       startAutoRefresh();
-      setupTvNav();
+      initPhotoPip();
     });
   </script>
 </body>
