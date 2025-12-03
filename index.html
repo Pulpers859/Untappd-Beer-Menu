@@ -493,9 +493,9 @@
     .photo-pip {
       position: absolute;
       right: 24px;
-      bottom: 120px; /* roughly on top of ticker shell */
-      width: 260px;
-      height: 150px;
+      bottom: 260px;              /* moved higher so it clears the ticker */
+      width: 520px;               /* 200% bigger (was 260px) */
+      height: 300px;              /* 200% bigger (was 150px) */
       border-radius: 12px;
       overflow: hidden;
       background: #050509;
@@ -503,19 +503,23 @@
       box-shadow:
         0 0 10px rgba(0, 0, 0, 0.9),
         0 0 14px rgba(79, 209, 255, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       z-index: 5;
     }
 
     .photo-pip img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.8s ease-in-out;
-    }
+  position: absolute;         /* stack all images on top of each other */
+  inset: 0;                   /* fill the whole window */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.photo-pip img.photo-pip-active {
+  opacity: 1;
+}
+
 
     .photo-pip img.photo-pip-active {
       opacity: 1;
