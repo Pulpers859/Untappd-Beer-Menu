@@ -549,8 +549,8 @@
 
         </div>
 
-        <!-- NEW: Big button to go to slideshow.html -->
-        <a href="slideshow.html" class="tv-nav-btn">
+        <!-- Button to go to slideshow.html -->
+        <a href="slideshow.html" class="tv-nav-btn" id="slideshowBtn">
           📸 View Brewery Photo Slideshow
         </a>
 
@@ -770,7 +770,6 @@
     const tickerContent = document.getElementById("tickerContent");
     const statusTime = document.getElementById("statusTime");
 
-    // NEW: state for the flip-card carousel
     let tickerData = [];
     let tickerIndex = 0;
     let tickerRotationTimer = null;
@@ -865,15 +864,7 @@
       return { user, beer, brewery };
     }
 
-    function addSeparator(parent) {
-      const dot = document.createElement("span");
-      dot.className = "ticker-separator";
-      dot.textContent = "·";
-      parent.appendChild(dot);
-    }
-
     function buildTicker(items) {
-      // Clear existing cards & timers
       tickerTrack.innerHTML = "";
       if (tickerRotationTimer) {
         clearInterval(tickerRotationTimer);
@@ -1019,9 +1010,33 @@
       setInterval(fetchCheckins, REFRESH_MS);
     }
 
+    // 🔑 FireTV-friendly: focus the button & use OK/Enter to open slideshow
+    function setupTvNav() {
+      const btn = document.getElementById("slideshowBtn");
+      if (btn) {
+        btn.setAttribute("tabindex", "0");
+        try {
+          btn.focus();
+        } catch (e) {
+          // some environments ignore focus(), that's fine
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        const key = e.key || e.code;
+        if (key === "Enter" || key === " " || key === "Space") {
+          const b = document.getElementById("slideshowBtn");
+          if (b && b.href) {
+            window.location.href = b.href;
+          }
+        }
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       fetchBeersFromSheet();
       startAutoRefresh();
+      setupTvNav();
     });
   </script>
 </body>
