@@ -29,8 +29,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
     }
@@ -44,15 +43,15 @@
     }
 
     .board {
-      position: relative;          /* so we can absolutely position the photo window */
+      position: relative;
       flex: 1 1 auto;
       width: 100%;
-      height: 100vh;           /* fill vertical screen */
+      height: 100vh;
       max-width: 1920px;
       display: flex;
       flex-direction: column;
       background: var(--bg-main);
-      border-radius: 0;        /* flush with screen edges */
+      border-radius: 0;
       border: 1px solid #20222c;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
       overflow: hidden;
@@ -64,8 +63,8 @@
       flex: 0 0 auto;
       padding: 12px 20px 10px;
       display: flex;
-      flex-direction: column;       /* stack vertically */
-      align-items: center;          /* center horizontally */
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
       gap: 8px;
       background: #101119;
@@ -78,12 +77,12 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent-yellow-soft);
-      text-align: center;           /* ensure centered text */
+      text-align: center;
     }
 
     .header-right {
       display: flex;
-      flex-direction: column;       /* QR row, then labels */
+      flex-direction: column;
       align-items: center;
       gap: 6px;
     }
@@ -91,7 +90,7 @@
     .header-qr-row {
       display: flex;
       align-items: center;
-      justify-content: center;      /* center horizontally */
+      justify-content: center;
       gap: 20px;
     }
 
@@ -378,13 +377,7 @@
       }
     }
 
-    /* === QR BLOCKS (dual neon) === */
-    .header-qr-row {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
+    /* === QR BLOCKS (single neon) === */
     .neon-qr {
       display: flex;
       align-items: center;
@@ -463,50 +456,6 @@
       }
     }
 
-    /* === PHOTO PIP WINDOW (bottom-right, 200% larger) === */
-    .photo-pip {
-      position: absolute;
-      right: 24px;
-      bottom: 260px;              /* moved higher so it clears the ticker */
-      width: 520px;               /* 200% bigger (was 260px) */
-      height: 300px;              /* 200% bigger (was 150px) */
-      border-radius: 12px;
-      overflow: hidden;
-      background: #050509;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow:
-        0 0 10px rgba(0, 0, 0, 0.9),
-        0 0 14px rgba(79, 209, 255, 0.5);
-      z-index: 5;
-    }
-
-    .photo-pip img {
-      position: absolute;         /* stack all images on top of each other */
-      inset: 0;                   /* fill the whole window */
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.8s ease-in-out;
-    }
-
-    .photo-pip img.photo-pip-active {
-      opacity: 1;
-    }
-
-    .photo-pip-label {
-      position: absolute;
-      left: 8px;
-      bottom: 6px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      background: rgba(0, 0, 0, 0.7);
-      color: #e5e7ff;
-    }
-
     @media (max-width: 900px) {
       .board {
         max-height: none;
@@ -531,13 +480,10 @@
       .ticker-label {
         display: none;
       }
-
-      .photo-pip {
-        display: none; /* hide the pip on very small screens */
-      }
     }
   </style>
 </head>
+
 <body>
   <div class="board">
     <header class="board-header">
@@ -557,17 +503,6 @@
             </div>
           </div>
 
-          <!-- Photo Drop QR -->
-          <div class="neon-qr">
-            <div class="neon-qr-inner">
-              <div class="neon-qr-text">
-                <span>Scan to Add Photos</span>
-                <strong>Photo Drop</strong>
-              </div>
-              <img src="qr-photodrop.png" alt="QR code for Photo Drop Album" />
-            </div>
-          </div>
-
         </div>
 
         <span class="section-label">On Tap</span>
@@ -579,12 +514,6 @@
       <div class="menu-column" id="menuColumnLeft"></div>
       <div class="menu-column" id="menuColumnRight"></div>
     </main>
-
-    <!-- PHOTO PIP WINDOW -->
-    <div class="photo-pip" id="photoPip">
-      <span class="photo-pip-label">Live Photos</span>
-      <!-- Images are injected here by JS -->
-    </div>
 
     <footer class="board-footer">
       <div class="ticker-shell">
@@ -607,14 +536,14 @@
           <span class="status-label">Status</span>
           <span class="status-time" id="statusTime">Updating…</span>
         </div>
-
       </div>
     </footer>
   </div>
 
   <script>
     // ========= TAP LIST VIA GOOGLE SHEETS =========
-    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
+    const GOOGLE_SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8XJ2EmSMTcR_XrbIegnEEZvGCmix6h9EnEgQi-QwUpIM0JQ0GkdtbiD1X5V29gdG_S81hKd3Eh6QA/pub?output=csv";
 
     const CATEGORY_FILTERS = [];
     let BEERS = [];
@@ -945,23 +874,13 @@
           ${cleanBeer ? '<span class="ticker-separator">·</span>' : ""}
           ${
             cleanBeer
-              ? `<span class="ticker-beer">${cleanBeer}${
-                  brewery ? " by " + brewery : ""
-                }</span>`
+              ? `<span class="ticker-beer">${cleanBeer}${brewery ? " by " + brewery : ""}</span>`
               : ""
           }
         </div>
         <div class="ticker-line-sub">
-          ${
-            rating
-              ? `<span class="ticker-rating">Rated ${rating}/5</span>`
-              : ""
-          }
-          ${
-            rating && time
-              ? '<span class="ticker-separator">·</span>'
-              : ""
-          }
+          ${rating ? `<span class="ticker-rating">Rated ${rating}/5</span>` : ""}
+          ${rating && time ? '<span class="ticker-separator">·</span>' : ""}
           ${time ? `<span class="ticker-time">${time}</span>` : ""}
         </div>
       `;
@@ -993,10 +912,7 @@
       newCard.addEventListener(
         "animationend",
         () => {
-          newCard.classList.remove(
-            "ticker-card--incoming",
-            "ticker-card--animate-in"
-          );
+          newCard.classList.remove("ticker-card--incoming", "ticker-card--animate-in");
         },
         { once: true }
       );
@@ -1031,73 +947,9 @@
       setInterval(fetchCheckins, REFRESH_MS);
     }
 
-    // ========= SMALL PHOTO PIP SLIDESHOW (bottom-right) =========
-    const PHOTO_USER   = "Pulpers859";
-    const PHOTO_REPO   = "Untappd-Beer-Menu";
-    const PHOTO_BRANCH = "main";     // ⚠️ change to "gh-pages" if that's your Pages branch
-    const PHOTO_DIR    = "photos";
-    const PHOTO_INTERVAL_MS = 10000; // 10 seconds per photo
-
-    async function initPhotoPip() {
-      const pip = document.getElementById("photoPip");
-      if (!pip) return;
-
-      const apiUrl = `https://api.github.com/repos/${PHOTO_USER}/${PHOTO_REPO}/contents/${PHOTO_DIR}?ref=${PHOTO_BRANCH}`;
-
-      try {
-        const res = await fetch(apiUrl);
-        if (!res.ok) {
-          console.warn("Photo PIP: GitHub API error", res.status);
-          return;
-        }
-
-        const data = await res.json();
-        const imageFiles = data.filter(item => {
-          if (!item.name) return false;
-          const lower = item.name.toLowerCase();
-          return lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
-                 lower.endsWith(".png") || lower.endsWith(".gif") ||
-                 lower.endsWith(".webp");
-        });
-
-        if (!imageFiles.length) {
-          console.warn("Photo PIP: no images found in /" + PHOTO_DIR);
-          return;
-        }
-
-        const urls = imageFiles.map(file =>
-          `https://raw.githubusercontent.com/${PHOTO_USER}/${PHOTO_REPO}/${PHOTO_BRANCH}/${PHOTO_DIR}/${encodeURIComponent(file.name)}`
-        );
-
-        // Create img elements
-        pip.querySelectorAll("img").forEach(img => img.remove());
-
-        const imgs = urls.map((url, idx) => {
-          const img = document.createElement("img");
-          img.src = url;
-          if (idx === 0) img.classList.add("photo-pip-active");
-          pip.appendChild(img);
-          return img;
-        });
-
-        if (imgs.length <= 1) return;
-
-        let current = 0;
-        setInterval(() => {
-          const prev = current;
-          current = (current + 1) % imgs.length;
-          imgs[prev].classList.remove("photo-pip-active");
-          imgs[current].classList.add("photo-pip-active");
-        }, PHOTO_INTERVAL_MS);
-      } catch (err) {
-        console.error("Photo PIP error:", err);
-      }
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
       fetchBeersFromSheet();
       startAutoRefresh();
-      initPhotoPip();
     });
   </script>
 </body>
